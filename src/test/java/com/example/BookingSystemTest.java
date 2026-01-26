@@ -148,7 +148,7 @@ class BookingSystemTest {
         //arrange
         String roomId = "room1";
         LocalDateTime startTime = now.plusDays(2);
-        LocalDateTime endTime = now.plusDays(1);
+        LocalDateTime endTime = now.plusDays(3);
         Room room = new Room(roomId, "King suite");
 
         //act + assert
