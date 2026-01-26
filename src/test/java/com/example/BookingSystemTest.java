@@ -257,7 +257,21 @@ class BookingSystemTest {
     //"Kan inte avboka påbörjad eller avslutad bokning"
     @Test
     void cancel_Booking_During_Or_After_Stay_Should_Throw_Exception(){
+        String bookingId = "B4567";
+        String roomId = "Room1";
+        LocalDateTime startTime = now.minusDays(1);
+        LocalDateTime endTime = now.plusDays(2);
 
+        Booking booking = new Booking(bookingId, roomId, startTime, endTime);
+        Room room = new Room(roomId, "Ocean Suite");
+        room.addBooking(booking);
+
+        when(roomRepository.findAll()).thenReturn(List.of(room));
+
+        assertThatThrownBy(()->
+                bookingSystem.cancelBooking(bookingId))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Kan inte avboka påbörjad eller avslutad bokning");
 
     }
 
