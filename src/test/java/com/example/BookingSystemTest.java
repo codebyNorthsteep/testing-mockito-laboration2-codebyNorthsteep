@@ -83,7 +83,7 @@ class BookingSystemTest {
 
     //"Sluttid måste vara efter starttid"
     @Test
-    void bookARoom_With_Invalid_Dates_EndBeforeStart() throws NotificationException {
+    void bookARoom_With_Invalid_Dates_EndBeforeStart_Should_Throw_Exception() throws NotificationException {
         //arrange - överflödig men bra för att se hela strukturen av mocken
         String roomId = "room1";
         LocalDateTime startTime = now.plusDays(2);
@@ -104,7 +104,7 @@ class BookingSystemTest {
 
     //"Bokning kräver giltiga start- och sluttider samt rum-id"
     @Test
-    void bookARoom_with_invalid_startAndOrEnd_time() throws NotificationException {
+    void bookARoom_with_invalid_startAndOrEnd_time_Should_Throw_Exception() throws NotificationException {
         //arrange - överflödig men bra för att se hela strukturen av mocken
         String roomId = "room1";
         LocalDateTime startTime = now.plusDays(2);
@@ -125,7 +125,7 @@ class BookingSystemTest {
 
     //"Kan inte boka tid i dåtid"
     @Test
-    void bookARoom_with_start_date_before_today() throws NotificationException {
+    void bookARoom_with_start_date_before_today_Should_Throw_Exception() throws NotificationException {
         //arrange - - överflödig men bra för att se hela strukturen av mocken
         String roomId = "room1";
         LocalDateTime startTime = now.minusDays(1);
@@ -146,7 +146,7 @@ class BookingSystemTest {
 
     //"Rummet existerar inte"
     @Test
-    void bookARoom_with_room_not_existing() throws NotificationException {
+    void bookARoom_with_room_not_existing_Should_Throw_Exception() throws NotificationException {
         //arrange - överflödig men bra för att se hela strukturen av mocken
         String roomId = "room1";
         LocalDateTime startTime = now.plusDays(2);
@@ -194,7 +194,7 @@ class BookingSystemTest {
 
     //"Måste ange både start- och sluttid"
     @Test
-    void getAvailableRooms_with_invalid_credentials() {
+    void getAvailableRooms_with_invalid_credentials_Should_Throw_Exception() {
         LocalDateTime startTime = null;
         LocalDateTime endTime = now.plusDays(2);
 
@@ -206,7 +206,7 @@ class BookingSystemTest {
 
     //"Sluttid måste vara efter starttid"
     @Test
-    void getAvailableRooms_With_end_before_start_date() {
+    void getAvailableRooms_With_end_before_start_date_Should_Throw_Exception() {
         LocalDateTime startTime = now.plusDays(2);
         LocalDateTime endTime = now.plusDays(1);
 
@@ -220,19 +220,44 @@ class BookingSystemTest {
 
 
     @Test
-    void cancel_Booking_With_Valid_Id() {
+    void cancel_Booking_With_Valid_Id() throws NotificationException {
+        String bookingId = "B4567";
+        String roomId = "Room1";
+        LocalDateTime startTime = now.plusDays(1);
+        LocalDateTime endTime = now.plusDays(2);
+
+        Booking booking = new Booking(bookingId, roomId, startTime, endTime);
+        Room room = new Room(roomId, "Ocean Suite");
+        room.addBooking(booking);
+
+        when(roomRepository.findAll()).thenReturn(List.of(room));
+
+        boolean result = bookingSystem.cancelBooking(bookingId);
+
+        //Assert
+        assertThat(result).isTrue();
+        verify(roomRepository).save(room);
+        verify(notificationService).sendCancellationConfirmation(booking);
+
+
 
     }
 
     //"Boknings-id kan inte vara null"
     @Test
-    void cancel_Booking_With_Invalid_Id() {
+    void cancel_Booking_With_Invalid_Id_Should_Throw_Exception() {
+        String bookingId = null;
+        assertThatThrownBy(()->
+                bookingSystem.cancelBooking(bookingId))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Boknings-id kan inte vara null");
 
     }
 
     //"Kan inte avboka påbörjad eller avslutad bokning"
     @Test
-    void cancel_Booking_During_Or_After_Stay(){
+    void cancel_Booking_During_Or_After_Stay_Should_Throw_Exception(){
+
 
     }
 
