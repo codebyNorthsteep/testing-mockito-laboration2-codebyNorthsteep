@@ -220,12 +220,19 @@ class BookingSystemTest {
 
 
     @Test
-    void cancelBookingWithValidCredentials() {
+    void cancel_Booking_With_Valid_Id() {
 
     }
 
+    //"Boknings-id kan inte vara null"
     @Test
-    void cancelBookingWithInvalidCredentials() {
+    void cancel_Booking_With_Invalid_Id() {
+
+    }
+
+    //"Kan inte avboka påbörjad eller avslutad bokning"
+    @Test
+    void cancel_Booking_During_Or_After_Stay(){
 
     }
 
