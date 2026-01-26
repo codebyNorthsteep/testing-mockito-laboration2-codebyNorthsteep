@@ -10,17 +10,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 //todo: Skapa tester för BookingSystem.java - både tester för lyckade bokningar samt misslyckade
-//todo: tester för att kunna boka ett rum (bookRoom) med id, starttid, sluttid - giltiga datum
-//todo: tester för att få tillgängliga rum (getAvailableRooms)
+
 //todo: avboka en bokning (cancelBooking)
 //todo: dokumentera testfallen med javadocs
-//todo: skriva test för varje exception?
 
 @ExtendWith(MockitoExtension.class)
 class BookingSystemTest {
@@ -37,10 +34,15 @@ class BookingSystemTest {
     private final LocalDateTime now = LocalDateTime.of(2026, 1, 20, 10, 0);
 
 
+    /**
+     * Konfigurerar testmiljön före varje testfall.
+     * Använder lenient() för timeProvider eftersom vissa testfall (t.ex. vid ogiltig indata)
+     * avbryts innan klockan behöver anropas, vilket annars skulle kasta UnnecessaryStubbingException.
+     */
     @BeforeEach
     void setUp() {
         bookingSystem = new BookingSystem(timeProvider, roomRepository, notificationService);
-        //Nu är alltid den fixerade tiden av now
+        //Nu är alltid den fixerade tiden av now, lenient()
         lenient().when(timeProvider.getCurrentTime()).thenReturn(now);
     }
 
@@ -82,11 +84,11 @@ class BookingSystemTest {
     //"Sluttid måste vara efter starttid"
     @Test
     void bookARoom_With_Invalid_Dates_EndBeforeStart() throws NotificationException {
-        //arrange
+        //arrange - överflödig men bra för att se hela strukturen av mocken
         String roomId = "room1";
         LocalDateTime startTime = now.plusDays(2);
         LocalDateTime endTime = now.plusDays(1);
-        Room room = new Room(roomId, "Ocean suite");
+        //Room room = new Room(roomId, "Ocean suite");
 
         //act + assert
         assertThatThrownBy(()->
@@ -103,11 +105,11 @@ class BookingSystemTest {
     //"Bokning kräver giltiga start- och sluttider samt rum-id"
     @Test
     void bookARoom_with_invalid_startAndOrEnd_time() throws NotificationException {
-        //arrange
+        //arrange - överflödig men bra för att se hela strukturen av mocken
         String roomId = "room1";
         LocalDateTime startTime = now.plusDays(2);
         LocalDateTime endTime = null;
-        Room room = new Room(roomId, "Beach house");
+        //Room room = new Room(roomId, "Beach house");
 
         //act + assert
         assertThatThrownBy(()->
@@ -124,11 +126,11 @@ class BookingSystemTest {
     //"Kan inte boka tid i dåtid"
     @Test
     void bookARoom_with_start_date_before_today() throws NotificationException {
-        //arrange
+        //arrange - - överflödig men bra för att se hela strukturen av mocken
         String roomId = "room1";
         LocalDateTime startTime = now.minusDays(1);
         LocalDateTime endTime = now.plusDays(1);
-        Room room = new Room(roomId, "Family room");
+        //Room room = new Room(roomId, "Family room");
 
         //act + assert
         assertThatThrownBy(()->
@@ -145,11 +147,11 @@ class BookingSystemTest {
     //"Rummet existerar inte"
     @Test
     void bookARoom_with_room_not_existing() throws NotificationException {
-        //arrange
+        //arrange - överflödig men bra för att se hela strukturen av mocken
         String roomId = "room1";
         LocalDateTime startTime = now.plusDays(2);
         LocalDateTime endTime = now.plusDays(3);
-        Room room = new Room(roomId, "King suite");
+        //Room room = new Room(roomId, "King suite");
 
         //act + assert
         assertThatThrownBy(()->
@@ -166,33 +168,56 @@ class BookingSystemTest {
     @Test
     void getAvailableRoomsWithValidCredentials() {
 
-//        void getAvailableRooms_ReturnsOnlyAvailable() {
-//            // Arrange
-//            LocalDateTime start = now.plusDays(1);
-//            LocalDateTime end = now.plusDays(1).plusHours(1);
-//
-//            Room room1 = new Room("room1", "Ledigt rum");
-//            Room room2 = new Room("room2", "Upptaget rum");
-//
-//            // Vi lägger till en bokning i room2 som krockar med vår sökning
-//            room2.addBooking(new Booking("b1", "room2", start, end));
-//
-//            when(roomRepository.findAll()).thenReturn(List.of(room1, room2));
-//
-//            // Act
-//            List<Room> result = bookingSystem.getAvailableRooms(start, end);
-//
-//            // Assert
-//            assertThat(result).hasSize(1);
-//            assertThat(result).containsExactly(room1);
-//            assertThat(result).doesNotContain(room2);
-//        }
+            // Arrange
+            LocalDateTime start = now.plusDays(1);
+            LocalDateTime end = now.plusDays(1).plusHours(1);
+
+            Room room1 = new Room("room1", "Ledigt rum");
+            Room room2 = new Room("room2", "Upptaget rum");
+
+            // Vi lägger till en bokning i room2 som krockar med vår sökning
+            room2.addBooking(new Booking("b1", "room2", start, end));
+
+            when(roomRepository.findAll()).thenReturn(List.of(room1, room2));
+
+            // Act
+            List<Room> result = bookingSystem.getAvailableRooms(start, end);
+
+            // Assert
+            assertThat(result).hasSize(1);
+            assertThat(result).containsExactly(room1);
+            assertThat(result).doesNotContain(room2);
+
     }
 
+    //test för att se om tillgång finns för att kunna se rum
+
+    //"Måste ange både start- och sluttid"
     @Test
-    void getAvailableRoomsWithInvalidCredentials() {
+    void getAvailableRooms_with_invalid_credentials() {
+        LocalDateTime startTime = null;
+        LocalDateTime endTime = now.plusDays(2);
 
+        assertThatThrownBy(()->
+                bookingSystem.getAvailableRooms(startTime, endTime))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Måste ange både start- och sluttid");
     }
+
+    //"Sluttid måste vara efter starttid"
+    @Test
+    void getAvailableRooms_With_end_before_start_date() {
+        LocalDateTime startTime = now.plusDays(2);
+        LocalDateTime endTime = now.plusDays(1);
+
+        assertThatThrownBy(()->
+                bookingSystem.getAvailableRooms(startTime, endTime))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Sluttid måste vara efter starttid");
+    }
+
+
+
 
     @Test
     void cancelBookingWithValidCredentials() {
