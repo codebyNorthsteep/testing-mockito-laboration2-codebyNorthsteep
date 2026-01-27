@@ -2,6 +2,8 @@ package com.example;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
 
@@ -17,7 +19,7 @@ import static org.mockito.Mockito.*;
 
 
 /**
- * Unit tests for {@link BookingSystem}.
+ * Unit tests for BookingSystem.
  * The test suite verifies the core behaviors of the booking system:
 
  *   Successful room bookings when a valid time window and existing room are provided.
@@ -33,6 +35,10 @@ import static org.mockito.Mockito.*;
  * Mock objects are configured with {@link MockitoSettings} and lenient stubbing
  * to avoid unnecessary exception failures when a test case terminates early.
  */
+
+//Kolla på vad jag kan ändra gällande stubbning, så att jag ej behöver ha lenient()
+//I de test som fungerar så gör jag en stub av ett objekt i testet, de som ej har det blir röda och mockito kastar en stubbingexeption
+//MockitoSettings kräver att de fält jag har markerat med @Mock SKA användas
 @MockitoSettings
 class BookingSystemTest {
 
@@ -58,9 +64,12 @@ class BookingSystemTest {
      */
     @BeforeEach
     void setUp() {
+        //Kolla booking
         bookingSystem = new BookingSystem(timeProvider, roomRepository, notificationService);
         //Nu är alltid den fixerade tiden now, lenient() för att undvika tidiga exceptions från Mockito
-        lenient().when(timeProvider.getCurrentTime()).thenReturn(now);
+        // då denna ligger i beforeEach så ger jag den ett löfte gällande att timeProvider kommar att användas i varje test
+        //Därför klaga mockito och anser att jag har onödig kod - kastar en exception
+        lenient().when(timeProvider.getCurrentTime()).thenReturn(now); //flytta den till metoden som använder den - fungerar
     }
 
 
@@ -161,7 +170,6 @@ class BookingSystemTest {
     }
 
 
-
     /**
      * Verifies that attempting to book a room with an invalid start and/or end time results in an
      * IllegalArgumentException. The test supplies an end time containing null (while the start time is
@@ -175,12 +183,15 @@ class BookingSystemTest {
      * @throws NotificationException if sending a booking confirmation fails (not relevant for this test)
      */
     //"Bokning kräver giltiga start- och sluttider samt rum-id"
+    //Når aldrig ner till att använda timeprovider
     @Test
-    void book_a_room_with_invalid_start_and_or_end_time_should_throw_exception() throws NotificationException {
+    void book_a_room_with_invalid_start_date_should_throw_exception() throws NotificationException {
         //arrange - överflödig men bra för att se hela strukturen av denna mock
         String roomId = "room1";
-        LocalDateTime startDate = now.plusDays(2);
-        LocalDateTime endDate = null;
+        LocalDateTime startDate = null;
+        LocalDateTime endDate = now.plusDays(2);
+
+        //Testa null åt båda håll
 
 
         //Act + Assert
@@ -194,6 +205,39 @@ class BookingSystemTest {
         verify(roomRepository, never())
                 .save(any());
     }
+
+    //"Bokning kräver giltiga start- och sluttider samt rum-id"
+    @Test
+    void book_a_room_with_invalid_end_date_should_throw_exception() throws NotificationException {
+        //arrange - överflödig men bra för att se hela strukturen av denna mock
+        String roomId = "room1";
+        LocalDateTime startDate = now.plusDays(2);
+        LocalDateTime endDate = null;
+
+        //Testa null åt båda håll
+
+
+        //Act + Assert
+        assertThatThrownBy(()->
+                bookingSystem.bookRoom(roomId, startDate, endDate))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Bokning kräver giltiga start- och sluttider samt rum-id");
+        //Asset
+        verify(notificationService, never())
+                .sendBookingConfirmation(any());
+        verify(roomRepository, never())
+                .save(any());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "Room1, null , now.plusHours(2)"
+    })
+    void nullCheck(){
+
+    }
+
+
 
     /**
      * Validates that BookingSystem method bookRoom(String, LocalDateTime, LocalDateTime) rejects a booking
@@ -342,10 +386,27 @@ class BookingSystemTest {
      */
     //"Måste ange både start- och sluttid"
     @Test
-    void get_available_rooms_with_invalid_credentials_should_throw_exception() {
+    void get_available_rooms_with_invalid_start_date_should_throw_exception() {
         //Arrange
         LocalDateTime startDate = null;
         LocalDateTime endDate = now.plusDays(2);
+
+        //Kolla null åt båda håll
+
+        //Act + Assert
+        assertThatThrownBy(()->
+                bookingSystem.getAvailableRooms(startDate, endDate))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Måste ange både start- och sluttid");
+    }
+
+    @Test
+    void get_available_rooms_with_invalid_end_date_should_throw_exception() {
+        //Arrange
+        LocalDateTime startDate = now.plusDays(1);
+        LocalDateTime endDate = null;
+
+        //Kolla null åt båda håll
 
         //Act + Assert
         assertThatThrownBy(()->
