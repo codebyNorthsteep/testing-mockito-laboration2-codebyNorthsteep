@@ -172,64 +172,64 @@ class BookingSystemTest {
     }
 
 
-    /**
-     * Verifies that attempting to book a room with an invalid start and/or end time results in an
-     * IllegalArgumentException. The test supplies an end time containing null (while the start time is
-     * valid) and expects the booking system to reject the request before any side effects occur.
+//    /**
+//     * Verifies that attempting to book a room with an invalid start and/or end time results in an
+//     * IllegalArgumentException. The test supplies an end time containing null (while the start time is
+//     * valid) and expects the booking system to reject the request before any side effects occur.
+//
+//     * The method under test, BookingSystem method bookRoom(String, LocalDateTime,
+//     * LocalDateTime), should throw an exception with a message containing
+//     * "Bokning kräver giltiga start-och sluttider samt rum-id". The test also confirms that
+//     * no notification is sent and that the room repository's {@code save} method is never invoked.
+//     *
+//     * @throws NotificationException if sending a booking confirmation fails (not relevant for this test)
+//     */
+//    //"Bokning kräver giltiga start- och sluttider samt rum-id"
+//    //Når aldrig ner till att använda timeprovider
+//    @Test
+//    void book_a_room_with_invalid_start_date_should_throw_exception() throws NotificationException {
+//        //arrange - överflödig men bra för att se hela strukturen av denna mock
+//        String roomId = "room1";
+//        LocalDateTime startDate = null;
+//        LocalDateTime endDate = now.plusDays(2);
+//
+//        //Testa null åt båda håll
+//
+//
+//        //Act + Assert
+//        assertThatThrownBy(()->
+//                bookingSystem.bookRoom(roomId, startDate, endDate))
+//                .isInstanceOf(IllegalArgumentException.class)
+//                .hasMessageContaining("Bokning kräver giltiga start- och sluttider samt rum-id");
+//        //Asset
+//        verify(notificationService, never())
+//                .sendBookingConfirmation(any());
+//        verify(roomRepository, never())
+//                .save(any());
+//    }
 
-     * The method under test, BookingSystem method bookRoom(String, LocalDateTime,
-     * LocalDateTime), should throw an exception with a message containing
-     * "Bokning kräver giltiga start-och sluttider samt rum-id". The test also confirms that
-     * no notification is sent and that the room repository's {@code save} method is never invoked.
-     *
-     * @throws NotificationException if sending a booking confirmation fails (not relevant for this test)
-     */
     //"Bokning kräver giltiga start- och sluttider samt rum-id"
-    //Når aldrig ner till att använda timeprovider
-    @Test
-    void book_a_room_with_invalid_start_date_should_throw_exception() throws NotificationException {
-        //arrange - överflödig men bra för att se hela strukturen av denna mock
-        String roomId = "room1";
-        LocalDateTime startDate = null;
-        LocalDateTime endDate = now.plusDays(2);
-
-        //Testa null åt båda håll
-
-
-        //Act + Assert
-        assertThatThrownBy(()->
-                bookingSystem.bookRoom(roomId, startDate, endDate))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Bokning kräver giltiga start- och sluttider samt rum-id");
-        //Asset
-        verify(notificationService, never())
-                .sendBookingConfirmation(any());
-        verify(roomRepository, never())
-                .save(any());
-    }
-
-    //"Bokning kräver giltiga start- och sluttider samt rum-id"
-    @Test
-    void book_a_room_with_invalid_end_date_should_throw_exception() throws NotificationException {
-        //arrange - överflödig men bra för att se hela strukturen av denna mock
-        String roomId = "room1";
-        LocalDateTime startDate = now.plusDays(2);
-        LocalDateTime endDate = null;
-
-        //Testa null åt båda håll
-
-
-        //Act + Assert
-        assertThatThrownBy(()->
-                bookingSystem.bookRoom(roomId, startDate, endDate))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Bokning kräver giltiga start- och sluttider samt rum-id");
-        //Asset
-        verify(notificationService, never())
-                .sendBookingConfirmation(any());
-        verify(roomRepository, never())
-                .save(any());
-    }
+//    @Test
+//    void book_a_room_with_invalid_end_date_should_throw_exception() throws NotificationException {
+//        //arrange - överflödig men bra för att se hela strukturen av denna mock
+//        String roomId = "room1";
+//        LocalDateTime startDate = now.plusDays(2);
+//        LocalDateTime endDate = null;
+//
+//        //Testa null åt båda håll
+//
+//
+//        //Act + Assert
+//        assertThatThrownBy(()->
+//                bookingSystem.bookRoom(roomId, startDate, endDate))
+//                .isInstanceOf(IllegalArgumentException.class)
+//                .hasMessageContaining("Bokning kräver giltiga start- och sluttider samt rum-id");
+//        //Asset
+//        verify(notificationService, never())
+//                .sendBookingConfirmation(any());
+//        verify(roomRepository, never())
+//                .save(any());
+//    }
 
     @ParameterizedTest
     @CsvSource({
@@ -339,106 +339,106 @@ class BookingSystemTest {
     // --- Tests for getAvailableRooms ---
 
 
-    /**
-     * Tests that BookingSystem method getAvailableRooms(LocalDateTime, LocalDateTime) returns only rooms that are not booked
-     * during the requested time interval.
-
-     * The test sets up two rooms: one free and one already booked for the given period. It verifies that the
-     * method correctly filters out the occupied room and returns a list containing solely the available room.
-     */
-    @Test
-    void get_available_rooms_with_valid_credentials() {
-
-            // Arrange
-            LocalDateTime startDate = now.plusDays(1);
-            LocalDateTime endDate = now.plusDays(1).plusHours(1);
-
-            Room room1 = new Room("room1", "Ledigt rum");
-            Room room2 = new Room("room2", "Upptaget rum");
-
-            //För att simulera ett redan bokat rum, för verifiering av att det rummet ej dyker upp i listan
-            room2.addBooking(new Booking("B2435531", "room2", startDate, endDate));
-
-            when(roomRepository.findAll()).thenReturn(List.of(room1, room2));
-
-            // Act
-            List<Room> result = bookingSystem.getAvailableRooms(startDate, endDate);
-
-            // Assert
-            assertThat(result).hasSize(1);
-            assertThat(result).containsExactly(room1);
-            assertThat(result).doesNotContain(room2);
-
-    }
+//    /**
+//     * Tests that BookingSystem method getAvailableRooms(LocalDateTime, LocalDateTime) returns only rooms that are not booked
+//     * during the requested time interval.
+//
+//     * The test sets up two rooms: one free and one already booked for the given period. It verifies that the
+//     * method correctly filters out the occupied room and returns a list containing solely the available room.
+//     */
+//    @Test
+//    void get_available_rooms_with_valid_credentials() {
+//
+//            // Arrange
+//            LocalDateTime startDate = now.plusDays(1);
+//            LocalDateTime endDate = now.plusDays(1).plusHours(1);
+//
+//            Room room1 = new Room("room1", "Ledigt rum");
+//            Room room2 = new Room("room2", "Upptaget rum");
+//
+//            //För att simulera ett redan bokat rum, för verifiering av att det rummet ej dyker upp i listan
+//            room2.addBooking(new Booking("B2435531", "room2", startDate, endDate));
+//
+//            when(roomRepository.findAll()).thenReturn(List.of(room1, room2));
+//
+//            // Act
+//            List<Room> result = bookingSystem.getAvailableRooms(startDate, endDate);
+//
+//            // Assert
+//            assertThat(result).hasSize(1);
+//            assertThat(result).containsExactly(room1);
+//            assertThat(result).doesNotContain(room2);
+//
+//    }
 
     //test för att se om tillgång finns för att kunna se rum
 
-    /**
-     * Verifies that BookingSystem method getAvailableRooms(LocalDateTime, LocalDateTime) throws an
-     * IllegalArgumentException when either the start or end time is null.
+//    /**
+//     * Verifies that BookingSystem method getAvailableRooms(LocalDateTime, LocalDateTime) throws an
+//     * IllegalArgumentException when either the start or end time is null.
+//
+//     * The test deliberately passes a startDate with a value of while supplying a valid future end
+//     * time. The expected behaviour is that the method validates its input arguments and rejects the
+//     * request before any interaction with the underlying RoomRepository. Consequently, the
+//     * exception message must contain the Swedish phrase "Måste ange både start-och sluttid".
+//
+//     * When this condition occurs, no room data should be queried or processed. The test uses
+//     * AssertJ’s assertThatThrownBy to confirm that the exception type and message are as
+//     * specified.
+//     */
+//    //"Måste ange både start- och sluttid"
+//    @Test
+//    void get_available_rooms_with_invalid_start_date_should_throw_exception() {
+//        //Arrange
+//        LocalDateTime startDate = null;
+//        LocalDateTime endDate = now.plusDays(2);
+//
+//        //Kolla null åt båda håll
+//
+//        //Act + Assert
+//        assertThatThrownBy(()->
+//                bookingSystem.getAvailableRooms(startDate, endDate))
+//                .isInstanceOf(IllegalArgumentException.class)
+//                .hasMessageContaining("Måste ange både start- och sluttid");
+//    }
 
-     * The test deliberately passes a startDate with a value of while supplying a valid future end
-     * time. The expected behaviour is that the method validates its input arguments and rejects the
-     * request before any interaction with the underlying RoomRepository. Consequently, the
-     * exception message must contain the Swedish phrase "Måste ange både start-och sluttid".
+//    @Test
+//    void get_available_rooms_with_invalid_end_date_should_throw_exception() {
+//        //Arrange
+//        LocalDateTime startDate = now.plusDays(1);
+//        LocalDateTime endDate = null;
+//
+//        //Kolla null åt båda håll
+//
+//        //Act + Assert
+//        assertThatThrownBy(()->
+//                bookingSystem.getAvailableRooms(startDate, endDate))
+//                .isInstanceOf(IllegalArgumentException.class)
+//                .hasMessageContaining("Måste ange både start- och sluttid");
+//    }
 
-     * When this condition occurs, no room data should be queried or processed. The test uses
-     * AssertJ’s assertThatThrownBy to confirm that the exception type and message are as
-     * specified.
-     */
-    //"Måste ange både start- och sluttid"
-    @Test
-    void get_available_rooms_with_invalid_start_date_should_throw_exception() {
-        //Arrange
-        LocalDateTime startDate = null;
-        LocalDateTime endDate = now.plusDays(2);
-
-        //Kolla null åt båda håll
-
-        //Act + Assert
-        assertThatThrownBy(()->
-                bookingSystem.getAvailableRooms(startDate, endDate))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Måste ange både start- och sluttid");
-    }
-
-    @Test
-    void get_available_rooms_with_invalid_end_date_should_throw_exception() {
-        //Arrange
-        LocalDateTime startDate = now.plusDays(1);
-        LocalDateTime endDate = null;
-
-        //Kolla null åt båda håll
-
-        //Act + Assert
-        assertThatThrownBy(()->
-                bookingSystem.getAvailableRooms(startDate, endDate))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Måste ange både start- och sluttid");
-    }
-
-    /**
-     * Ensures that BookingSystem method getAvailableRooms(LocalDateTime, LocalDateTime) throws an
-     * IllegalArgumentException when the supplied end time precedes the start time.
-
-     * The test arranges a future start date and an earlier end date, then verifies that the method
-     * rejects the request by throwing an exception whose message contains the Swedish phrase
-     * "Sluttid måste vara efter starttid". No interaction with RoomRepository should occur
-     * because validation fails before any repository queries.
-     */
-    //"Sluttid måste vara efter starttid"
-    @Test
-    void get_available_rooms_with_end_before_start_date_should_throw_exception() {
-        //Arrange
-        LocalDateTime startDate = now.plusDays(2);
-        LocalDateTime endDate = now.plusDays(1);
-
-        //Act + Assert
-        assertThatThrownBy(()->
-                bookingSystem.getAvailableRooms(startDate, endDate))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Sluttid måste vara efter starttid");
-    }
+//    /**
+//     * Ensures that BookingSystem method getAvailableRooms(LocalDateTime, LocalDateTime) throws an
+//     * IllegalArgumentException when the supplied end time precedes the start time.
+//
+//     * The test arranges a future start date and an earlier end date, then verifies that the method
+//     * rejects the request by throwing an exception whose message contains the Swedish phrase
+//     * "Sluttid måste vara efter starttid". No interaction with RoomRepository should occur
+//     * because validation fails before any repository queries.
+//     */
+//    //"Sluttid måste vara efter starttid"
+//    @Test
+//    void get_available_rooms_with_end_before_start_date_should_throw_exception() {
+//        //Arrange
+//        LocalDateTime startDate = now.plusDays(2);
+//        LocalDateTime endDate = now.plusDays(1);
+//
+//        //Act + Assert
+//        assertThatThrownBy(()->
+//                bookingSystem.getAvailableRooms(startDate, endDate))
+//                .isInstanceOf(IllegalArgumentException.class)
+//                .hasMessageContaining("Sluttid måste vara efter starttid");
+//    }
 
     // --- Tests for cancelBooking ---
 
@@ -482,24 +482,24 @@ class BookingSystemTest {
 
     }
 
-    /**
-     * Tests that attempting to cancel a booking with an invalid (null) booking ID
-     * results in an IllegalArgumentException. The exception message should
-     * contain the text "Boknings-id kan inte vara null".
-     */
-    //"Boknings-id kan inte vara null"
-    @Test
-    void cancel_booking_with_invalid_id_should_throw_exception() {
-        //Arrange
-        String bookingId = null;
-
-        //Act + Assert
-        assertThatThrownBy(()->
-                bookingSystem.cancelBooking(bookingId))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Boknings-id kan inte vara null");
-
-    }
+//    /**
+//     * Tests that attempting to cancel a booking with an invalid (null) booking ID
+//     * results in an IllegalArgumentException. The exception message should
+//     * contain the text "Boknings-id kan inte vara null".
+//     */
+//    //"Boknings-id kan inte vara null"
+//    @Test
+//    void cancel_booking_with_invalid_id_should_throw_exception() {
+//        //Arrange
+//        String bookingId = null;
+//
+//        //Act + Assert
+//        assertThatThrownBy(()->
+//                bookingSystem.cancelBooking(bookingId))
+//                .isInstanceOf(IllegalArgumentException.class)
+//                .hasMessageContaining("Boknings-id kan inte vara null");
+//
+//    }
 
     /**
      * Verifies that attempting to cancel a booking either currently in progress
@@ -570,39 +570,30 @@ class BookingSystemTest {
         verify(roomRepository).save(room);
     }
 
-    /**
-     * Verifies that attempting to cancel a booking with an ID that does not exist in the system
-     * correctly results in false. The test sets up a single room without any bookings,
-     * invokes BookingSystem method cancelBooking(String) with a non‑existent booking ID, and
-     * asserts that the method returns false, indicating that no cancellation could be performed.
-     */
-    //(roomWithBooking.isEmpty())
-    @Test
-    void cancel_room_if_bookingId_not_exists_should_return_false() {
-        //Arrange
-        String bookingId = "B2884";
-        Room room = new Room("Room 1", "Ocean Suite");
-        when(roomRepository.findAll()).thenReturn(List.of(room));
-
-        //Act
-        boolean result = bookingSystem.cancelBooking(bookingId);
-
-        //Assert
-        assertThat(result).isFalse();
-
-    }
+//    /**
+//     * Verifies that attempting to cancel a booking with an ID that does not exist in the system
+//     * correctly results in false. The test sets up a single room without any bookings,
+//     * invokes BookingSystem method cancelBooking(String) with a non‑existent booking ID, and
+//     * asserts that the method returns false, indicating that no cancellation could be performed.
+//     */
+//    //(roomWithBooking.isEmpty())
+//    @Test
+//    void cancel_room_if_bookingId_not_exists_should_return_false() {
+//        //Arrange
+//        String bookingId = "B2884";
+//        Room room = new Room("Room 1", "Ocean Suite");
+//        when(roomRepository.findAll()).thenReturn(List.of(room));
+//
+//        //Act
+//        boolean result = bookingSystem.cancelBooking(bookingId);
+//
+//        //Assert
+//        assertThat(result).isFalse();
+//
+//    }
 
     @Nested
     public class BookingSystemTestForTime {
-        @Mock
-        private TimeProvider timeProvider;
-        @Mock
-        private RoomRepository roomRepository;
-        @Mock
-        private NotificationService notificationService;
-
-        //SUT, System Under Test
-        private BookingSystem bookingSystem;
 
         private final LocalDateTime now = LocalDateTime.of(2026, 1, 20, 10, 0);
 
@@ -623,6 +614,216 @@ class BookingSystemTest {
             //Därför klaga mockito och anser att jag har onödig kod - kastar en exception
             when(timeProvider.getCurrentTime()).thenReturn(now); //flytta den till metoden som använder den - fungerar
         }
+
+        //--- Tests for bookRoom ---
+
+        //todo: test för roomId null
+
+        @Test
+        void book_a_room_with_invalid_end_date_should_throw_exception() throws NotificationException {
+            //arrange - överflödig men bra för att se hela strukturen av denna mock
+            String roomId = "room1";
+            LocalDateTime startDate = now.plusDays(2);
+            LocalDateTime endDate = null;
+
+            //Testa null åt båda håll
+
+
+            //Act + Assert
+            assertThatThrownBy(()->
+                    bookingSystem.bookRoom(roomId, startDate, endDate))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Bokning kräver giltiga start- och sluttider samt rum-id");
+            //Asset
+            verify(notificationService, never())
+                    .sendBookingConfirmation(any());
+            verify(roomRepository, never())
+                    .save(any());
+        }
+
+        /**
+         * Verifies that attempting to book a room with an invalid start and/or end time results in an
+         * IllegalArgumentException. The test supplies an end time containing null (while the start time is
+         * valid) and expects the booking system to reject the request before any side effects occur.
+
+         * The method under test, BookingSystem method bookRoom(String, LocalDateTime,
+         * LocalDateTime), should throw an exception with a message containing
+         * "Bokning kräver giltiga start-och sluttider samt rum-id". The test also confirms that
+         * no notification is sent and that the room repository's {@code save} method is never invoked.
+         *
+         * @throws NotificationException if sending a booking confirmation fails (not relevant for this test)
+         */
+        //"Bokning kräver giltiga start- och sluttider samt rum-id"
+        //Når aldrig ner till att använda timeprovider
+        @Test
+        void book_a_room_with_invalid_start_date_should_throw_exception() throws NotificationException {
+            //arrange - överflödig men bra för att se hela strukturen av denna mock
+            String roomId = "room1";
+            LocalDateTime startDate = null;
+            LocalDateTime endDate = now.plusDays(2);
+
+            //Testa null åt båda håll
+
+
+            //Act + Assert
+            assertThatThrownBy(()->
+                    bookingSystem.bookRoom(roomId, startDate, endDate))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Bokning kräver giltiga start- och sluttider samt rum-id");
+            //Asset
+            verify(notificationService, never())
+                    .sendBookingConfirmation(any());
+            verify(roomRepository, never())
+                    .save(any());
+        }
+
+
+        //--- Tests for getAvailableRooms ---
+
+
+        /**
+         * Tests that BookingSystem method getAvailableRooms(LocalDateTime, LocalDateTime) returns only rooms that are not booked
+         * during the requested time interval.
+
+         * The test sets up two rooms: one free and one already booked for the given period. It verifies that the
+         * method correctly filters out the occupied room and returns a list containing solely the available room.
+         */
+        @Test
+        void get_available_rooms_with_valid_credentials() {
+
+            // Arrange
+            LocalDateTime startDate = now.plusDays(1);
+            LocalDateTime endDate = now.plusDays(1).plusHours(1);
+
+            Room room1 = new Room("room1", "Ledigt rum");
+            Room room2 = new Room("room2", "Upptaget rum");
+
+            //För att simulera ett redan bokat rum, för verifiering av att det rummet ej dyker upp i listan
+            room2.addBooking(new Booking("B2435531", "room2", startDate, endDate));
+
+            when(roomRepository.findAll()).thenReturn(List.of(room1, room2));
+
+            // Act
+            List<Room> result = bookingSystem.getAvailableRooms(startDate, endDate);
+
+            // Assert
+            assertThat(result).hasSize(1);
+            assertThat(result).containsExactly(room1);
+            assertThat(result).doesNotContain(room2);
+
+        }
+
+        /**
+         * Ensures that BookingSystem method getAvailableRooms(LocalDateTime, LocalDateTime) throws an
+         * IllegalArgumentException when the supplied end time precedes the start time.
+
+         * The test arranges a future start date and an earlier end date, then verifies that the method
+         * rejects the request by throwing an exception whose message contains the Swedish phrase
+         * "Sluttid måste vara efter starttid". No interaction with RoomRepository should occur
+         * because validation fails before any repository queries.
+         */
+        //"Sluttid måste vara efter starttid"
+        @Test
+        void get_available_rooms_with_end_before_start_date_should_throw_exception() {
+            //Arrange
+            LocalDateTime startDate = now.plusDays(2);
+            LocalDateTime endDate = now.plusDays(1);
+
+            //Act + Assert
+            assertThatThrownBy(()->
+                    bookingSystem.getAvailableRooms(startDate, endDate))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Sluttid måste vara efter starttid");
+        }
+
+        /**
+         * Verifies that BookingSystem method getAvailableRooms(LocalDateTime, LocalDateTime) throws an
+         * IllegalArgumentException when either the start or end time is null.
+
+         * The test deliberately passes a startDate with a value of while supplying a valid future end
+         * time. The expected behaviour is that the method validates its input arguments and rejects the
+         * request before any interaction with the underlying RoomRepository. Consequently, the
+         * exception message must contain the Swedish phrase "Måste ange både start-och sluttid".
+
+         * When this condition occurs, no room data should be queried or processed. The test uses
+         * AssertJ’s assertThatThrownBy to confirm that the exception type and message are as
+         * specified.
+         */
+        //"Måste ange både start- och sluttid"
+        @Test
+        void get_available_rooms_with_invalid_start_date_should_throw_exception() {
+            //Arrange
+            LocalDateTime startDate = null;
+            LocalDateTime endDate = now.plusDays(2);
+
+            //Kolla null åt båda håll
+
+            //Act + Assert
+            assertThatThrownBy(()->
+                    bookingSystem.getAvailableRooms(startDate, endDate))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Måste ange både start- och sluttid");
+        }
+
+        @Test
+        void get_available_rooms_with_invalid_end_date_should_throw_exception() {
+            //Arrange
+            LocalDateTime startDate = now.plusDays(1);
+            LocalDateTime endDate = null;
+
+            //Kolla null åt båda håll
+
+            //Act + Assert
+            assertThatThrownBy(()->
+                    bookingSystem.getAvailableRooms(startDate, endDate))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Måste ange både start- och sluttid");
+        }
+
+
+        //--- Tests for cancelBooking ---
+
+        /**
+         * Verifies that attempting to cancel a booking with an ID that does not exist in the system
+         * correctly results in false. The test sets up a single room without any bookings,
+         * invokes BookingSystem method cancelBooking(String) with a non‑existent booking ID, and
+         * asserts that the method returns false, indicating that no cancellation could be performed.
+         */
+        //(roomWithBooking.isEmpty())
+        @Test
+        void cancel_room_if_bookingId_not_exists_should_return_false() {
+            //Arrange
+            String bookingId = "B2884";
+            Room room = new Room("Room 1", "Ocean Suite");
+            when(roomRepository.findAll()).thenReturn(List.of(room));
+
+            //Act
+            boolean result = bookingSystem.cancelBooking(bookingId);
+
+            //Assert
+            assertThat(result).isFalse();
+
+        }
+
+        /**
+         * Tests that attempting to cancel a booking with an invalid (null) booking ID
+         * results in an IllegalArgumentException. The exception message should
+         * contain the text "Boknings-id kan inte vara null".
+         */
+        //"Boknings-id kan inte vara null"
+        @Test
+        void cancel_booking_with_invalid_id_should_throw_exception() {
+            //Arrange
+            String bookingId = null;
+
+            //Act + Assert
+            assertThatThrownBy(()->
+                    bookingSystem.cancelBooking(bookingId))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Boknings-id kan inte vara null");
+
+        }
+
 
     }
 
