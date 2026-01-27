@@ -67,12 +67,15 @@ class BookingSystemTest {
     void setUp() {
         //Kolla booking
         bookingSystem = new BookingSystem(timeProvider, roomRepository, notificationService);
-        //Nu är alltid den fixerade tiden now, lenient() för att undvika tidiga exceptions från Mockito
-        // då denna ligger i beforeEach så ger jag den ett löfte gällande att timeProvider kommer att användas i varje test
-        //Därför klaga mockito och anser att jag har onödig kod - kastar en exception
-        when(timeProvider.getCurrentTime()).thenReturn(now); //flytta den till metoden som använder den - fungerar
+
     }
 
+@Nested
+public class BookingSystemFlowTests{
+    @BeforeEach
+    void setUp() {
+        when(timeProvider.getCurrentTime()).thenReturn(now);
+    }
 
 // --- Tests for bookRoom ---
 
@@ -380,11 +383,11 @@ class BookingSystemTest {
         verify(roomRepository).save(room);
     }
 
-
+}
     @Nested
-    public class BookingSystemTestForTime {
+    public class BookingSystemTestForValidation {
 
-        private final LocalDateTime now = LocalDateTime.of(2026, 1, 20, 10, 0);
+        //private final LocalDateTime now = LocalDateTime.of(2026, 1, 20, 10, 0);
 
 
         /**
@@ -394,15 +397,6 @@ class BookingSystemTest {
          * are aborted before the clock needs to be invoked, which would otherwise throw an
          * UnnecessaryStubbingException.
          */
-        @BeforeEach
-        void setUp() {
-            //Kolla booking
-            //bookingSystem = new BookingSystem(timeProvider, roomRepository, notificationService);
-            //Nu är alltid den fixerade tiden now, lenient() för att undvika tidiga exceptions från Mockito
-            // då denna ligger i beforeEach så ger jag den ett löfte gällande att timeProvider kommer att användas i varje test
-            //Därför klaga mockito och anser att jag har onödig kod - kastar en exception
-            lenient().when(timeProvider.getCurrentTime()).thenReturn(now); //flytta den till metoden som använder den - fungerar
-        }
 
         //--- Tests for bookRoom ---
 
