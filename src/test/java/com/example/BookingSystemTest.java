@@ -1,6 +1,7 @@
 package com.example;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -39,6 +40,7 @@ import static org.mockito.Mockito.*;
 //Kolla på vad jag kan ändra gällande stubbning, så att jag ej behöver ha lenient()
 //I de test som fungerar så gör jag en stub av ett objekt i testet, de som ej har det blir röda och mockito kastar en stubbingexeption
 //MockitoSettings kräver att de fält jag har markerat med @Mock SKA användas
+    //Gör en inre klass @Nestled - Nestled classes
 @MockitoSettings
 class BookingSystemTest {
 
@@ -67,9 +69,9 @@ class BookingSystemTest {
         //Kolla booking
         bookingSystem = new BookingSystem(timeProvider, roomRepository, notificationService);
         //Nu är alltid den fixerade tiden now, lenient() för att undvika tidiga exceptions från Mockito
-        // då denna ligger i beforeEach så ger jag den ett löfte gällande att timeProvider kommar att användas i varje test
+        // då denna ligger i beforeEach så ger jag den ett löfte gällande att timeProvider kommer att användas i varje test
         //Därför klaga mockito och anser att jag har onödig kod - kastar en exception
-        lenient().when(timeProvider.getCurrentTime()).thenReturn(now); //flytta den till metoden som använder den - fungerar
+        when(timeProvider.getCurrentTime()).thenReturn(now); //flytta den till metoden som använder den - fungerar
     }
 
 
@@ -587,6 +589,40 @@ class BookingSystemTest {
 
         //Assert
         assertThat(result).isFalse();
+
+    }
+
+    @Nested
+    public class BookingSystemTestForTime {
+        @Mock
+        private TimeProvider timeProvider;
+        @Mock
+        private RoomRepository roomRepository;
+        @Mock
+        private NotificationService notificationService;
+
+        //SUT, System Under Test
+        private BookingSystem bookingSystem;
+
+        private final LocalDateTime now = LocalDateTime.of(2026, 1, 20, 10, 0);
+
+
+        /**
+         * Configures the test environment before each test case.
+         * Puts the mocked in-parameters for class BookingSystems constructor.
+         * Uses lenient() for the timeProvider because some test cases (e.g., with invalid input)
+         * are aborted before the clock needs to be invoked, which would otherwise throw an
+         * UnnecessaryStubbingException.
+         */
+        @BeforeEach
+        void setUp() {
+            //Kolla booking
+            bookingSystem = new BookingSystem(timeProvider, roomRepository, notificationService);
+            //Nu är alltid den fixerade tiden now, lenient() för att undvika tidiga exceptions från Mockito
+            // då denna ligger i beforeEach så ger jag den ett löfte gällande att timeProvider kommer att användas i varje test
+            //Därför klaga mockito och anser att jag har onödig kod - kastar en exception
+            when(timeProvider.getCurrentTime()).thenReturn(now); //flytta den till metoden som använder den - fungerar
+        }
 
     }
 
