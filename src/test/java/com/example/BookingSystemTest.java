@@ -3,14 +3,20 @@ package com.example;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,7 +46,8 @@ import static org.mockito.Mockito.*;
 //I de test som fungerar så gör jag en stub av ett objekt i testet, de som ej har det blir röda och mockito kastar en stubbingexeption
 //MockitoSettings kräver att de fält jag har markerat med @Mock SKA användas
     //Gör en inre klass @Nestled - Nestled classes
-@MockitoSettings
+//@MockitoSettings - Innehåller @ExtendWith plus andra inställningar tex lenient()
+@ExtendWith(MockitoExtension.class)
 class BookingSystemTest {
 
     @Mock
@@ -51,6 +58,7 @@ class BookingSystemTest {
     private NotificationService notificationService;
 
     //SUT, System Under Test
+    @InjectMocks
     private BookingSystem bookingSystem;
 
     private final LocalDateTime now = LocalDateTime.of(2026, 1, 20, 10, 0);
@@ -63,17 +71,12 @@ class BookingSystemTest {
      * are aborted before the clock needs to be invoked, which would otherwise throw an
      * UnnecessaryStubbingException.
      */
-    @BeforeEach
-    void setUp() {
-        //Kolla booking
-        bookingSystem = new BookingSystem(timeProvider, roomRepository, notificationService);
-
-    }
 
 @Nested
 public class BookingSystemFlowTests{
     @BeforeEach
     void setUp() {
+        //when sätts för de tester som kommer träffa på timeProvider i BookingSystem
         when(timeProvider.getCurrentTime()).thenReturn(now);
     }
 
@@ -110,7 +113,7 @@ public class BookingSystemFlowTests{
         //Assert
         assertThat(result).isTrue();
         verify(roomRepository).save(room);
-        verify(notificationService).sendBookingConfirmation(any(Booking.class));
+        verify(notificationService).sendBookingConfirmation(any());
 
 
     }
@@ -401,28 +404,8 @@ public class BookingSystemFlowTests{
         //--- Tests for bookRoom ---
 
         @ParameterizedTest
-        @CsvSource({
-                "Room1, null , now.plusDays(2)",
-                "null, now.plusDays(1) , now.plusDays(2)",
-                "Room1, now.plusDays(2) , null"
-        })
-        void nullCheck(){
-
-        }
-
-        //todo: test för roomId null
-
-        @Test
-        void book_a_room_with_invalid_end_date_should_throw_exception() throws NotificationException {
-            //arrange - överflödig men bra för att se hela strukturen av denna mock
-            String roomId = "room1";
-            LocalDateTime startDate = now.plusDays(2);
-            LocalDateTime endDate = null;
-
-            //Testa null åt båda håll
-
-
-            //Act + Assert
+        @MethodSource("nullCheckArguments")
+        void nullCheck(String roomId, LocalDateTime startDate, LocalDateTime endDate) throws NotificationException {
             assertThatThrownBy(()->
                     bookingSystem.bookRoom(roomId, startDate, endDate))
                     .isInstanceOf(IllegalArgumentException.class)
@@ -434,40 +417,14 @@ public class BookingSystemFlowTests{
                     .save(any());
         }
 
-        /**
-         * Verifies that attempting to book a room with an invalid start and/or end time results in an
-         * IllegalArgumentException. The test supplies an end time containing null (while the start time is
-         * valid) and expects the booking system to reject the request before any side effects occur.
+        static Stream<Arguments> nullCheckArguments () {
+            LocalDateTime now = LocalDateTime.now();
+            return Stream.of(
+                    Arguments.of("Room1",null,now.plusDays(2)),
+                    Arguments.of(null, now.plusDays(1), now.plusDays(2)),
+                    Arguments.of("Room1", now.plusDays(1), null)
 
-         * The method under test, BookingSystem method bookRoom(String, LocalDateTime,
-         * LocalDateTime), should throw an exception with a message containing
-         * "Bokning kräver giltiga start-och sluttider samt rum-id". The test also confirms that
-         * no notification is sent and that the room repository's {@code save} method is never invoked.
-         *
-         * @throws NotificationException if sending a booking confirmation fails (not relevant for this test)
-         */
-        //"Bokning kräver giltiga start- och sluttider samt rum-id"
-        //Når aldrig ner till att använda timeprovider
-        @Test
-        void book_a_room_with_invalid_start_date_should_throw_exception() throws NotificationException {
-            //arrange - överflödig men bra för att se hela strukturen av denna mock
-            String roomId = "room1";
-            LocalDateTime startDate = null;
-            LocalDateTime endDate = now.plusDays(2);
-
-            //Testa null åt båda håll
-
-
-            //Act + Assert
-            assertThatThrownBy(()->
-                    bookingSystem.bookRoom(roomId, startDate, endDate))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("Bokning kräver giltiga start- och sluttider samt rum-id");
-            //Asset
-            verify(notificationService, never())
-                    .sendBookingConfirmation(any());
-            verify(roomRepository, never())
-                    .save(any());
+            );
         }
 
 
