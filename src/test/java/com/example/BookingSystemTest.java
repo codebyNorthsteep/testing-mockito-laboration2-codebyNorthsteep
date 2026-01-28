@@ -6,12 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,7 +22,12 @@ import static org.mockito.Mockito.*;
 
 
 
-
+/**
+ * Unit test suite for {@link BookingSystem}.
+ * * Verifies the core business logic including room reservations, availability searches,
+ * and cancellation procedures. Dependencies are mocked to ensure isolated testing
+ * of the booking logic.
+ */
 //I de test som fungerar så gör jag en stub av ett objekt i testet, de som ej har det blir röda och mockito kastar en stubbingexeption
 //Gör två inre klasser @Nestled - Nestled classes
 //@MockitoSettings - Innehåller @ExtendWith plus andra inställningar tex lenient()
@@ -44,32 +47,26 @@ class BookingSystemTest {
 
     private final LocalDateTime now = LocalDateTime.of(2026, 1, 20, 10, 0);
 
-
+    /**
+     * Operational flow tests for the BookingSystem.
+     * Focuses on both successful and unsuccessfull execution paths and complex business rules.
+     */
 @Nested
 public class BookingSystemFlowTests{
     @BeforeEach
     void setUp() {
-        //when sätts för de tester som kommer träffa på timeProvider i BookingSystem
+// Fixes the system time to ensure consistent behavior for time-sensitive logic, this due to a StubbingException thrown
         when(timeProvider.getCurrentTime()).thenReturn(now);
     }
 
 // --- Tests for bookRoom ---
-
-    /**
-     * Validates that a room can be successfully booked when all input parameters are correct.
-
-     * The test sets up a mock of RoomRepository to return an existing Room
-     * for the supplied roomId. It then calls BookingSystems method bookRoom(String, LocalDateTime, LocalDateTime)
-     * with a start time one day in the future and an end time two days in the future.
-
-     * Assertions verify that:
-     * The method returns true, indicating a successful booking.
-     * The repository's {}save method is invoked with the updated room instance.
-     * A confirmation notification is sent via the NotificationService method sendBookingConfirmation (Booking).
-
-     * This test confirms that under normal circumstances the booking workflow
-     * persists the new booking and triggers a notification without throwing exceptions.
-     */
+        /**
+         * Verifies that a room is correctly booked when provided with valid input.
+         * <p>
+         * Setup: Mock the booking of a room.
+         * Expectation: Method returns true, the room is saved to roomRepository,
+         * and a confirmation email is triggered(NotificationService).
+         */
     @Test
     void book_a_room_with_valid_credentials() throws NotificationException{
         //Arrange
@@ -90,16 +87,13 @@ public class BookingSystemFlowTests{
 
 
     }
-    /**
-     * Verifies that the BookingSystem method bookRoom(String, LocalDateTime, LocalDateTime)
-     * persists a booking even when the notification service throws an exception.
 
-     * The test sets up a mock room repository to return a specific Room instance,
-     * configures the notification service to throw NotificationException,
-     * and then calls bookRoom. It asserts that the method returns true
-     * and that the repository's save method is invoked, confirming that
-     * the booking operation continues despite notification failures. */
-    // Fortsätt även om notifieringen misslyckas
+        /**
+         * Ensures that booking persistence remains successful even if the notification service fails.
+         * <p>
+         * Logic: The primary booking action should not be rolled back due to secondary notification errors.
+         * Assert and verify: That the booking was made and that the room was saved in the RoomRepository.
+         */
     @Test
     void book_room_even_if_notification_fails() throws NotificationException {
         //Arrange
@@ -118,17 +112,12 @@ public class BookingSystemFlowTests{
 
     }
 
-    /**
-     * Verifies that BookingSystem method bookRoom(String, LocalDateTime, LocalDateTime)
-     * throws an IllegalArgumentException when the supplied end time is before
-     * the start time. The test supplies a valid room identifier and two code
-     * LocalDateTime instances where the second one precedes the first. It asserts
-     * that the exception message contains the phrase "Sluttid måste vara efter starttid".
-
-     * Additionally, the test confirms that no booking confirmation is sent and
-     * that the room repository’s method save is never invoked, ensuring that
-     * the invalid input prevents any persistence or notification side effects.
-     */
+        /**
+         * Verifies that the system prevents bookings where the end time is before the start time.
+         * <p>
+         * Expectation: Throws IllegalArgumentException with a message and stops execution before saving or notifying.
+         * Verifies that the room is never booked.
+         */
     @Test
     void book_a_room_with_invalid_dates_end_before_start_should_throw_exception() throws NotificationException {
         //Arrange - överflödig men bra för att se hela strukturen av denna mock
@@ -150,18 +139,11 @@ public class BookingSystemFlowTests{
 
 
 
-    /**
-     * Validates that BookingSystem method bookRoom(String, LocalDateTime, LocalDateTime) rejects a booking
-     * request whose start time is in the past.
-
-     * The test constructs a startDate that is one day before the current time and an endDate
-     * that lies in the future. It then verifies that invoking bookRoom throws an
-     * IllegalArgumentException with a message containing the Swedish phrase
-     * “Kan inte boka tid i dåtid”.
-
-     * The test also ensures that no side effects occur: the notification service is not called and the room
-     * repository’s save method is never invoked.
-     */
+        /**
+         * Verifies that the system rejects booking requests for dates that have already passed.
+         * Expectation: Throws IllegalArgumentException with a message and stops execution before saving or notifying.
+         * Verifies that the room is never booked.
+         */
     @Test
     void book_a_room_with_start_date_before_today_should_throw_exception() throws NotificationException {
         //Arrange, överflödig men bra för att se hela strukturen av denna mock
@@ -182,18 +164,11 @@ public class BookingSystemFlowTests{
                 .save(any());
     }
 
-    /**
-     * Verifies that attempting to book a non‑existent room results in an IllegalArgumentException.
-
-     * The test supplies a roomId that is not present in the mocked RoomRepository.  When
-     * BookingSystem method bookRoom(String, LocalDateTime, LocalDateTime) is invoked,
-     * it should throw an exception whose message contains "Rummet existerar inte".
-
-     * Additionally, the test asserts that no side effects occur: the notification service must not be
-     *  called, and the repository’s RoomRepository method save(Room) method must never be invoked.
-     *
-     * @throws NotificationException if a booking confirmation could not be sent (not relevant for this test)
-     */
+        /**
+         * Verifies that an attempt to book a non-existent room ID results in an appropriate exception.
+         * Expectation: Throws IllegalArgumentException with a message and stops execution before saving or notifying.
+         * Verifies that the room is never booked.
+         */
     @Test
     void book_a_room_when_room_not_existing_should_throw_exception() throws NotificationException {
         //arrange - överflödig men bra för att se hela strukturen av denna mock
@@ -213,15 +188,10 @@ public class BookingSystemFlowTests{
                 .save(any());
     }
 
-    /**
-     * Verifies that BookingSystem method bookRoom(String, LocalDateTime, LocalDateTime) correctly
-     * refuses to create a booking when the requested time slot is already taken.
-
-     * The test sets up a Room with an existing Booking that overlaps the
-     * requested interval.  When bookRoom() is called, it should return false
-     * and leave the repository untouched – no call to RoomRepository method save(Room) must
-     * occur.
-     */
+        /**
+         * Confirms that a booking request returns false if the room is already booked for the given interval.
+         * Verifies that the room is never booked.
+         */
     @Test
     void book_room_if_room_occupied_should_return_false() {
         //Arrange
@@ -246,19 +216,12 @@ public class BookingSystemFlowTests{
     // --- Tests for cancelBooking ---
 
 
-    /**
-     * Attempts to cancel an existing booking identified by the given bookingId.
-
-     * The method searches through all rooms retrieved from the repository, locates the booking,
-     * removes it from the room’s schedule, persists the updated room state, and notifies the user
-     * of the cancellation. If the booking is successfully canceled, the method returns true;
-     * otherwise, it returns false.
-
-     * bookingId the unique identifier of the booking to cancel
-     * returns true if a booking with the specified ID was found and removed. Returns false
-     * otherwise.
-     * Throws NotificationException if an error occurs while sending the cancellation confirmation
-     */
+        /**
+         * Mocks a booking for the RoomRepository.
+         * Verifies the successful cancellation of that existing future booking.
+         * <p>
+         * Expectation: Booking is removed from the room, room state is persisted, and user is notified.
+         */
     @Test
     void cancel_booking_with_valid_id() throws NotificationException {
         //Arrange
@@ -284,17 +247,12 @@ public class BookingSystemFlowTests{
     }
 
 
-    /**
-     * Verifies that attempting to cancel a booking either currently in progress
-     * or has already finished results in an IllegalStateException.
-
-     * The test sets up a booking whose start date is one day before the current time and
-     * ends two days after. It then registers this booking with a room, mocks the repository
-     * to return that room, and calls cancelBooking on the system under test.
-
-     * The expected outcome is that an IllegalStateException is thrown,
-     * containing the message fragment "Kan inte avboka påbörjad eller avslutad bokning",
-     * indicating that bookings which are already underway or completed cannot be canceled.*/
+        /**
+         * Mocks a booking for the RoomRepository.
+         * Ensures that bookings currently in progress or already completed cannot be canceled.
+         * <p>
+         * Expectation: Throws IllegalStateException as cancellation is only permitted for future stays.
+         */
     @Test
     void cancel_booking_during_or_after_stay_should_throw_exception(){
         //Arrange
@@ -315,19 +273,15 @@ public class BookingSystemFlowTests{
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Kan inte avboka påbörjad eller avslutad bokning");
 
+        //verify()?
+
     }
-    /**
-     * Tests that the booking system continues to cancel a booking even when sending a
-     * cancellation confirmation through the notification service throws an exception.
-
-     * The test sets up a booking and associates it with a room. It then simulates a failure in
-     *  the NotificationService method sendCancellationConfirmation(Booking) by throwing a
-     * NotificationException. After invoking cancelBooking on the system, the test verifies
-     * that the cancellation succeeds (returns true) and that the updated room state is persisted.
-
-     * This behavior ensures that transient notification failures do not prevent critical booking
-     * lifecycle operations from completing.
-     */
+        /**
+         * Ensures that cancelling persistence remains successful even if the notification service fails.
+         * <p>
+         * Logic: The primary cancelling action should not be rolled back due to secondary notification errors.
+         * Assert and verify: That the booking was canceled and that the room was deleted in the RoomRepository.
+         */
     @Test
     void cancel_booking_even_if_notification_fails() throws NotificationException {
         //Arrange
@@ -352,20 +306,18 @@ public class BookingSystemFlowTests{
     }
 
 }
+    /**
+     * Input validation and availability check tests.
+     * Verifies how the system handles null inputs and filtering of available rooms.
+     */
     @Nested
     public class BookingSystemTestForValidation {
 
-
-        /**
-         * Configures the test environment before each test case.
-         * Puts the mocked in-parameters for class BookingSystems constructor.
-         * Uses lenient() for the timeProvider because some test cases (e.g., with invalid input)
-         * are aborted before the clock needs to be invoked, which would otherwise throw an
-         * UnnecessaryStubbingException.
-         */
-
         //--- Tests for bookRoom ---
 
+        /** Using ParameterizedTest for checking multiple scenarios.
+         * Validates that the booking method rejects null values for room ID or timestamps.
+         */
         @ParameterizedTest
         @MethodSource("nullCheckArguments")
         void nullCheck(String roomId, LocalDateTime startDate, LocalDateTime endDate) throws NotificationException {
@@ -393,13 +345,9 @@ public class BookingSystemFlowTests{
 
         //--- Tests for getAvailableRooms ---
 
-
-        /**
-         * Tests that BookingSystem method getAvailableRooms(LocalDateTime, LocalDateTime) returns only rooms that are not booked
-         * during the requested time interval.
-
-         * The test sets up two rooms: one free and one already booked for the given period. It verifies that the
-         * method correctly filters out the occupied room and returns a list containing solely the available room.
+        /** Mocks the booking of two rooms, one of which is occupied to ensure that the room is
+         * not shown during search.
+         * Verifies that availability search correctly filters out rooms with conflicting bookings.
          */
         @Test
         void get_available_rooms_with_valid_credentials() {
@@ -427,13 +375,8 @@ public class BookingSystemFlowTests{
         }
 
         /**
-         * Ensures that BookingSystem method getAvailableRooms(LocalDateTime, LocalDateTime) throws an
-         * IllegalArgumentException when the supplied end time precedes the start time.
-
-         * The test arranges a future start date and an earlier end date, then verifies that the method
-         * rejects the request by throwing an exception whose message contains the Swedish phrase
-         * "Sluttid måste vara efter starttid". No interaction with RoomRepository should occur
-         * because validation fails before any repository queries.
+         * Ensures availability checks require valid chronological time ranges.
+         * Expectation: Throws IllegalArgumentException with a message.
          */
         @Test
         void get_available_rooms_with_end_before_start_date_should_throw_exception() {
@@ -448,7 +391,10 @@ public class BookingSystemFlowTests{
                     .hasMessageContaining("Sluttid måste vara efter starttid");
         }
 
-
+        /** Using ParameterizedTest for checking multiple scenarios.
+         * Validates that the getAvailableRooms method rejects null values for timestamps.
+         * Expectation: Throws IllegalArgumentException with a message.
+         */
         @ParameterizedTest
         @MethodSource("nullCheckArgumentsForDates")
         void get_available_rooms_with_invalid_start_or_end_date_should_throw_exception(LocalDateTime startDate, LocalDateTime endDate) {
@@ -471,12 +417,9 @@ public class BookingSystemFlowTests{
 
 
         //--- Tests for cancelBooking ---
-
         /**
-         * Verifies that attempting to cancel a booking with an ID that does not exist in the system
-         * correctly results in false. The test sets up a single room without any bookings,
-         * invokes BookingSystem method cancelBooking(String) with a non‑existent booking ID, and
-         * asserts that the method returns false, indicating that no cancellation could be performed.
+         * Confirms that attempting to cancel a booking with an unknown ID returns false.
+         *
          */
         @Test
         void cancel_room_if_booking_id_not_exists_should_return_false() {
@@ -490,13 +433,13 @@ public class BookingSystemFlowTests{
 
             //Assert
             assertThat(result).isFalse();
+            //verify()?
 
         }
 
         /**
-         * Test that attempting to cancel a booking with an invalid (null) booking ID
-         * results in an IllegalArgumentException. The exception message should
-         * contain the text "Boknings-id kan inte vara null".
+         * Verifies that cancellation logic rejects null as a booking ID.
+         * Expectation: Throws IllegalArgumentException with a message.
          */
         @Test
         void cancel_booking_with_invalid_booking_id_should_throw_exception() {
