@@ -334,7 +334,7 @@ public class BookingSystemFlowTests{
         }
 
         static Stream<Arguments> nullCheckArguments () {
-            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime now = LocalDateTime.of(2026, 1, 20, 10, 0);
             return Stream.of(
                     Arguments.of("Room1",null,now.plusDays(2)),
                     Arguments.of(null, now.plusDays(1), now.plusDays(2)),
@@ -371,7 +371,6 @@ public class BookingSystemFlowTests{
             // Assert
             assertThat(result).hasSize(1);
             assertThat(result).containsExactly(room1);
-            assertThat(result).doesNotContain(room2);
 
         }
 
@@ -408,7 +407,7 @@ public class BookingSystemFlowTests{
         }
 
         static Stream<Arguments> nullCheckArgumentsForDates () {
-            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime now = LocalDateTime.of(2026, 1, 20, 10, 0);
             return Stream.of(
                     Arguments.of(null,now.plusDays(2)),
                     Arguments.of(now.plusDays(1), null)
