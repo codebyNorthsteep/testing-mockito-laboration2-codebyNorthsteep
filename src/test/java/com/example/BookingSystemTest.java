@@ -52,7 +52,7 @@ class BookingSystemTest {
      * Focuses on both successful and unsuccessfull execution paths and complex business rules.
      */
 @Nested
-public class BookingSystemFlowTests{
+class BookingSystemFlowTests{
     @BeforeEach
     void setUp() {
 // Fixes the system time to ensure consistent behavior for time-sensitive logic, this due to a StubbingException thrown
@@ -312,7 +312,7 @@ public class BookingSystemFlowTests{
      * Verifies how the system handles null inputs and filtering of available rooms.
      */
     @Nested
-    public class BookingSystemTestForValidation {
+    class BookingSystemTestForValidation {
 
         //--- Tests for bookRoom ---
 
