@@ -274,6 +274,7 @@ public class BookingSystemFlowTests{
                 .hasMessageContaining("Kan inte avboka påbörjad eller avslutad bokning");
 
         //verify()?
+        verify(roomRepository, never()).save(room);
 
     }
         /**
@@ -345,7 +346,7 @@ public class BookingSystemFlowTests{
 
         //--- Tests for getAvailableRooms ---
 
-        /** Mocks the booking of two rooms, one of which is occupied to ensure that the room is
+        /** Mocks two rooms, one of which is occupied to ensure that the room is
          * not shown during search.
          * Verifies that availability search correctly filters out rooms with conflicting bookings.
          */
@@ -433,7 +434,8 @@ public class BookingSystemFlowTests{
 
             //Assert
             assertThat(result).isFalse();
-            //verify()?
+            //verify()? För att kontrollera att inget rum avbokades
+            verify(roomRepository, never()).save(room);
 
         }
 
@@ -449,6 +451,7 @@ public class BookingSystemFlowTests{
                     bookingSystem.cancelBooking(null))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("Boknings-id kan inte vara null");
+
 
         }
 
