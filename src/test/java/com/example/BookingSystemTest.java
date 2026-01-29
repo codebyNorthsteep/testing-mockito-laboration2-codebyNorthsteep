@@ -452,7 +452,6 @@ public class BookingSystemFlowTests{
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("Boknings-id kan inte vara null");
 
-
         }
 
 
