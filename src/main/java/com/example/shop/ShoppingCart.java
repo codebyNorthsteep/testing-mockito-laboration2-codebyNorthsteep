@@ -15,4 +15,10 @@ public class ShoppingCart {
     public List<Item> getShoppingList() {
         return this.shoppingList;
     }
+
+    public void removeItem(Item item) {
+
+        shoppingList.remove(item);
+
+    }
 }

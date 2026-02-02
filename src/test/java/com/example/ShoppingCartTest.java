@@ -21,4 +21,17 @@ public class ShoppingCartTest {
 
     }
 
+    @Test
+    void remove_an_item_from_shopping_cart(){
+        ShoppingCart shoppingCart = new ShoppingCart();
+
+        Item item = new Item("Milk", 19.00, 1);
+        shoppingCart.addItem(item);
+
+        shoppingCart.removeItem(item);
+
+        assertThat(shoppingCart.getShoppingList()).isEmpty();
+    }
+
+
 }
