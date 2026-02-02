@@ -12,10 +12,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ShoppingCartTest {
     //Lägg till en vara i shoppingCart
     @Test
-    void add_one_item_to_shopping_cart(){
+    void add_one_item_to_shopping_cart() {
 
         ShoppingCart shoppingCart = new ShoppingCart();
-        Item item = new Item("Juice", 34.00,1);
+        Item item = new Item("Juice", 34.00, 1);
 
         shoppingCart.addItem(item);
 
@@ -25,7 +25,7 @@ public class ShoppingCartTest {
     }
 
     @Test
-    void remove_an_item_from_shopping_cart(){
+    void remove_an_item_from_shopping_cart() {
         ShoppingCart shoppingCart = new ShoppingCart();
 
         Item item = new Item("Milk", 19.00, 1);
@@ -37,9 +37,8 @@ public class ShoppingCartTest {
     }
 
     //Test for calculation totalprice
-
     @Test
-    void get_total_price_for_items_in_shopping_cart(){
+    void get_total_price_for_items_in_shopping_cart() {
         ShoppingCart shoppingCart = new ShoppingCart();
 
         Stream.of(
@@ -48,7 +47,20 @@ public class ShoppingCartTest {
                 new Item("Sugar", 28.00, 1)
         ).forEach(shoppingCart::addItem);
 
-        assertEquals(100.00, shoppingCart.getTotalPrice(), "Summan av varorna ska bli 100kr");
+        assertEquals(100.00, shoppingCart.getTotalPrice(), "Summan av varorna ska bli 100.00kr");
     }
+
+    //Test for applying discounts
+    @Test
+    void apply_5_percent_discount_on_total_price() {
+        ShoppingCart shoppingCart = new ShoppingCart();
+        Item item = new Item("Gevalia mörkrost", 80.00, 2);
+        shoppingCart.addItem(item);
+        shoppingCart.addDiscount(0.05);
+
+        assertEquals(152.00, shoppingCart.getTotalPrice(), "Summan av varorna med rabatt ska bli 152.00kr");
+
+    }
+
 
 }

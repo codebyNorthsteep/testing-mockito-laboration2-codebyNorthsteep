@@ -5,7 +5,8 @@ import java.util.List;
 
 public class ShoppingCart {
 
-    List<Item> shoppingList = new ArrayList<>();
+    private List<Item> shoppingList = new ArrayList<>();
+    private double baseDiscountRate = 0.0;
 
     public void addItem(Item item) {
 
@@ -23,8 +24,14 @@ public class ShoppingCart {
     }
 
     public double getTotalPrice() {
-        return shoppingList.stream()
+        double totalBeforeDiscount = shoppingList.stream()
                 .mapToDouble(Item::getSubTotalPrice)
                 .sum();
+
+        return totalBeforeDiscount * (1 - baseDiscountRate);
+    }
+
+    public void addDiscount(double discountRate) {
+        this.baseDiscountRate = discountRate;
     }
 }
