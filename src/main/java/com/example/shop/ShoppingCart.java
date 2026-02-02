@@ -21,4 +21,10 @@ public class ShoppingCart {
         shoppingList.remove(item);
 
     }
+
+    public double getTotalPrice() {
+        return shoppingList.stream()
+                .mapToDouble(Item::getSubTotalPrice)
+                .sum();
+    }
 }
