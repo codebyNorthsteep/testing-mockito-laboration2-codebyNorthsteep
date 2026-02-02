@@ -44,11 +44,11 @@ public double getSubTotalPrice(){
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Item item)) return false;
-        return Double.compare(price, item.price) == 0 && quantity == item.quantity && Objects.equals(itemName, item.itemName);
+        return Double.compare(price, item.price) == 0 && Objects.equals(itemName, item.itemName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(itemName, price, quantity);
+        return Objects.hash(itemName, price);
     }
 }

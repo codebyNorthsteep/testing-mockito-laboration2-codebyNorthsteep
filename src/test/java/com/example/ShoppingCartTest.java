@@ -9,8 +9,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
+
 
 public class ShoppingCartTest {
     //Lägg till en vara i shoppingCart
@@ -76,4 +75,17 @@ public class ShoppingCartTest {
 
     }
 
+    //Handle quiantity - updates
+    @Test
+    void update_quantity_of_items(){
+        ShoppingCart shoppingCart = new ShoppingCart();
+        Item item1 = new Item("Yoghurt", 26.00, 1);
+        Item item2 = new Item("Yoghurt", 26.00, 2);
+
+        shoppingCart.addItem(item1);
+        shoppingCart.addItem(item2);
+
+        //Listan ska bara ha 1 rad med 3 exemplar av youghurt trots två olika inserts
+        assertThat(shoppingCart.getShoppingList()).hasSize(1);
+    }
 }

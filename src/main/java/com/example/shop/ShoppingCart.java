@@ -8,9 +8,16 @@ public class ShoppingCart {
     private List<Item> shoppingList = new ArrayList<>();
     private double baseDiscountRate = 0.0;
 
-    public void addItem(Item item) {
+    public void addItem(Item newItem) {
+        for(Item existingItem : shoppingList) {
+            if(existingItem.equals(newItem)) {
+                int updatedQuantity = existingItem.getQuantity() + newItem.getQuantity();
+                existingItem.setQuantity(updatedQuantity);
+                return;
+            }
+        }
 
-        shoppingList.add(item);
+        shoppingList.add(newItem);
     }
 
     public List<Item> getShoppingList() {
