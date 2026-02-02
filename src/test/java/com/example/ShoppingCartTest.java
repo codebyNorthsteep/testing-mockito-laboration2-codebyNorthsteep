@@ -7,7 +7,10 @@ import org.junit.jupiter.api.Test;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
 
 public class ShoppingCartTest {
     //Lägg till en vara i shoppingCart
@@ -61,6 +64,16 @@ public class ShoppingCartTest {
         assertEquals(152.00, shoppingCart.getTotalPrice(), "Summan av varorna med rabatt ska bli 152.00kr");
 
     }
+    //EdgeCase for if the discount rate get set to 1.0 and makes the item free
+    @Test
+    void should_throw_exception_if_invalid_discount_rate(){
+        ShoppingCart shoppingCart = new ShoppingCart();
 
+        assertThatThrownBy(()->
+                shoppingCart.addDiscount(1.10))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Ogiltig rabatt.");
+
+    }
 
 }
