@@ -76,6 +76,8 @@ class ShoppingCartTest {
 
         //Listan ska bara ha 1 rad med 3 exemplar av youghurt trots två olika inserts
         assertThat(shoppingCart.getShoppingList()).hasSize(1);
+        //Efter pit-mutations, kontrollera att kvantiteten faktiskt blir 3
+        assertThat(shoppingCart.getShoppingList().getFirst().getQuantity()).isEqualTo(3);
     }
 
 
@@ -86,7 +88,7 @@ class ShoppingCartTest {
         ShoppingCart shoppingCart = new ShoppingCart();
 
         assertThatThrownBy(()->
-                shoppingCart.addDiscount(1.10))
+                shoppingCart.addDiscount(1.0))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Ogiltig rabatt.");
 
