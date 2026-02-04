@@ -16,11 +16,11 @@ public double getSubTotalPrice(){
         return price * quantity;
 }
 
-    public Double getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 

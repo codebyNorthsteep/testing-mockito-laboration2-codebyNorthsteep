@@ -11,8 +11,7 @@ FR 2: Prisberäkning
 2.2 Beräkna totalpris: Systemet ska returnera det slutgiltiga priset efter att alla tillämpliga rabatter har dragits av.
 
 FR 3: Rabatthantering
-3.1 Applicera fast rabatt: Systemet ska kunna dra av en fast summa (t.ex. 50 kr) från totalbeloppet.
 
-3.2 Applicera procentuell rabatt: Systemet ska kunna dra av en procentsats (t.ex. 10%) från totalbeloppet.
+3.1 Applicera procentuell rabatt: Systemet ska kunna dra av en procentsats (t.ex. 10%) från totalbeloppet.
 
-3.3 Validering: Rabatter ska inte kunna göra att totalpriset blir negativt eller gratis.
+3.2 Validering: Rabatter ska inte kunna göra att totalpriset blir negativt eller gratis.

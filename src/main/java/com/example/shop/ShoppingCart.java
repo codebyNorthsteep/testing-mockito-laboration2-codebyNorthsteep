@@ -51,7 +51,7 @@ public class ShoppingCart {
     }
 
     public void addDiscount(double discountRate) {
-        if (discountRate >= 1.0) {
+        if (discountRate < 0.0 || discountRate >= 1.0) {
             throw new IllegalArgumentException("Ogiltig rabatt.");
         }
 
