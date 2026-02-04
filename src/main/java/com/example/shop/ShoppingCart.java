@@ -12,6 +12,9 @@ public class ShoppingCart {
         if(newItem.getPrice() < 0)
             throw new IllegalArgumentException("Pris kan ej vara negativt");
 
+        if(newItem.getQuantity() <= 0)
+            throw new IllegalArgumentException("Kvantitet måste vara större än 0");
+
         for(Item existingItem : shoppingList) {
             if(existingItem.equals(newItem)) {
                 int updatedQuantity = existingItem.getQuantity() + newItem.getQuantity();

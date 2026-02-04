@@ -66,7 +66,7 @@ class ShoppingCartTest {
 
     //Handle quiantity - updates
     @Test
-    void update_quantity_of_items(){
+    void update_quantity_of_items() {
         ShoppingCart shoppingCart = new ShoppingCart();
         Item item1 = new Item("Yoghurt", 26.00, 1);
         Item item2 = new Item("Yoghurt", 26.00, 2);
@@ -84,10 +84,10 @@ class ShoppingCartTest {
     //--- Edge-Cases ---
     //EdgeCase for if the discount rate gets set to 1.0 and makes the item free
     @Test
-    void should_throw_exception_if_invalid_discount_rate(){
+    void should_throw_exception_if_invalid_discount_rate() {
         ShoppingCart shoppingCart = new ShoppingCart();
 
-        assertThatThrownBy(()->
+        assertThatThrownBy(() ->
                 shoppingCart.addDiscount(1.0))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Ogiltig rabatt.");
@@ -103,7 +103,7 @@ class ShoppingCartTest {
 
         shoppingCart.addItem(existingItem);
 
-        assertThatThrownBy(()->
+        assertThatThrownBy(() ->
                 shoppingCart.removeItem(nonExistentItem))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Kan ej ta bort ikke-existerande vara, listan lämnas oförändrad.");
@@ -121,6 +121,18 @@ class ShoppingCartTest {
                 shoppingCart.addItem(item))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Pris kan ej vara negativt");
+    }
+
+    //Edge-case test for zero quantity
+    @Test
+    void should_throw_exception_if_item_has_zero_quantity() {
+        ShoppingCart shoppingCart = new ShoppingCart();
+        Item item = new Item("Oboy", 36.90, 0);
+
+        assertThatThrownBy(() ->
+                shoppingCart.addItem(item))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Kvantitet måste vara större än 0");
     }
 
 
