@@ -135,5 +135,17 @@ class ShoppingCartTest {
                 .hasMessageContaining("Kvantitet måste vara större än 0");
     }
 
+    //Edge-case test for blank item-name
+    @Test
+    void should_throw_exception_if_item_name_is_blank() {
+        ShoppingCart shoppingCart = new ShoppingCart();
+        Item item = new Item("", 20.0, 1);
+
+        assertThatThrownBy(() ->
+                shoppingCart.addItem(item))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Ej giltigt varunamn");
+    }
+
 
 }

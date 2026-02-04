@@ -15,6 +15,9 @@ public class ShoppingCart {
         if(newItem.getQuantity() <= 0)
             throw new IllegalArgumentException("Kvantitet måste vara större än 0");
 
+        if(newItem.getItemName().isBlank())
+            throw new IllegalArgumentException("Ej giltigt varunamn");
+
         for(Item existingItem : shoppingList) {
             if(existingItem.equals(newItem)) {
                 int updatedQuantity = existingItem.getQuantity() + newItem.getQuantity();
