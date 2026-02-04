@@ -26,6 +26,10 @@ public class ShoppingCart {
 
     public void removeItem(Item item) {
 
+        if (!shoppingList.contains(item)) {
+            throw new IllegalStateException("Kan ej ta bort ikke-existerande vara, listan lämnas oförändrad.");
+
+        }
         shoppingList.remove(item);
 
     }

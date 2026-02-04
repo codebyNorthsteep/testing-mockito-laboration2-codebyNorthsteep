@@ -3,7 +3,7 @@ FR 1: Hantering av varor (Items)
 
 1.2 Ta bort varor: Systemet ska kunna ta bort en vara.
 
-1.3 Uppdatera kvantitet: Systemet ska kunna ändra antalet av en befintlig vara. Om kvantiteten sätts till 0, ska varan tas bort.
+1.3 Uppdatera kvantitet: Systemet ska kunna ändra antalet av en befintlig vara. Om ny vara av samma sort läggs till, ska endast 1 rad uppdateras i form av kvantitet.
 
 FR 2: Prisberäkning
 2.1 Beräkna subtotal: Systemet ska kunna räkna ut det totala värdet av alla varor i korgen (pris × kvantitet) innan eventuella rabatter.
@@ -15,4 +15,4 @@ FR 3: Rabatthantering
 
 3.2 Applicera procentuell rabatt: Systemet ska kunna dra av en procentsats (t.ex. 10%) från totalbeloppet.
 
-3.3 Validering: Rabatter ska inte kunna göra att totalpriset blir negativt.
+3.3 Validering: Rabatter ska inte kunna göra att totalpriset blir negativt eller gratis.

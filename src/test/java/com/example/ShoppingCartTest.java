@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-public class ShoppingCartTest {
+class ShoppingCartTest {
     //Lägg till en vara i shoppingCart
     @Test
     void add_one_item_to_shopping_cart() {
@@ -63,17 +63,6 @@ public class ShoppingCartTest {
         assertEquals(152.00, shoppingCart.getTotalPrice(), "Summan av varorna med rabatt ska bli 152.00kr");
 
     }
-    //EdgeCase for if the discount rate get set to 1.0 and makes the item free
-    @Test
-    void should_throw_exception_if_invalid_discount_rate(){
-        ShoppingCart shoppingCart = new ShoppingCart();
-
-        assertThatThrownBy(()->
-                shoppingCart.addDiscount(1.10))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Ogiltig rabatt.");
-
-    }
 
     //Handle quiantity - updates
     @Test
@@ -87,5 +76,36 @@ public class ShoppingCartTest {
 
         //Listan ska bara ha 1 rad med 3 exemplar av youghurt trots två olika inserts
         assertThat(shoppingCart.getShoppingList()).hasSize(1);
+    }
+
+
+    //--- Edge-Cases ---
+    //EdgeCase for if the discount rate gets set to 1.0 and makes the item free
+    @Test
+    void should_throw_exception_if_invalid_discount_rate(){
+        ShoppingCart shoppingCart = new ShoppingCart();
+
+        assertThatThrownBy(()->
+                shoppingCart.addDiscount(1.10))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Ogiltig rabatt.");
+
+    }
+
+    //Edge case test for removing an item that is not in the cart
+    @Test
+    void removing_non_added_item_should_not_effect_cart() {
+        ShoppingCart shoppingCart = new ShoppingCart();
+        Item existingItem = new Item("Pepsi", 18.90, 1);
+        Item nonExistentItem = new Item("Coca Cola", 19.90, 1);
+
+        shoppingCart.addItem(existingItem);
+
+        assertThatThrownBy(()->
+                shoppingCart.removeItem(nonExistentItem))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Kan ej ta bort ikke-existerande vara, listan lämnas oförändrad.");
+
+        assertThat(shoppingCart.getShoppingList()).containsExactly(existingItem);
     }
 }
