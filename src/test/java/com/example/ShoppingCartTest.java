@@ -49,7 +49,7 @@ class ShoppingCartTest {
                 new Item("Sugar", 28.00, 1)
         ).forEach(shoppingCart::addItem);
 
-        assertEquals(100.00, shoppingCart.getTotalPrice(), 0.001,"Summan av varorna ska bli 100.00kr");
+        assertEquals(100.00, shoppingCart.getTotalPrice(), 0.001, "Summan av varorna ska bli 100.00kr");
     }
 
     //Test for applying discounts
@@ -60,7 +60,7 @@ class ShoppingCartTest {
         shoppingCart.addItem(item);
         shoppingCart.addDiscount(0.05);
 
-        assertEquals(152.00, shoppingCart.getTotalPrice(), 0.001,"Summan av varorna med rabatt ska bli 152.00kr");
+        assertEquals(152.00, shoppingCart.getTotalPrice(), 0.001, "Summan av varorna med rabatt ska bli 152.00kr");
 
     }
 

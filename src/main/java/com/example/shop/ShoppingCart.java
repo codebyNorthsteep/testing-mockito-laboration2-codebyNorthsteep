@@ -9,17 +9,17 @@ public class ShoppingCart {
     private double baseDiscountRate = 0.0;
 
     public void addItem(Item newItem) {
-        if(newItem.getPrice() < 0)
+        if (newItem.getPrice() < 0)
             throw new IllegalArgumentException("Pris kan ej vara negativt");
 
-        if(newItem.getQuantity() <= 0)
+        if (newItem.getQuantity() <= 0)
             throw new IllegalArgumentException("Kvantitet måste vara större än 0");
 
-        if(newItem.getItemName().isBlank())
+        if (newItem.getItemName() == null || newItem.getItemName().isBlank())
             throw new IllegalArgumentException("Ej giltigt varunamn");
 
-        for(Item existingItem : shoppingList) {
-            if(existingItem.equals(newItem)) {
+        for (Item existingItem : shoppingList) {
+            if (existingItem.equals(newItem)) {
                 int updatedQuantity = existingItem.getQuantity() + newItem.getQuantity();
                 existingItem.setQuantity(updatedQuantity);
                 return;
