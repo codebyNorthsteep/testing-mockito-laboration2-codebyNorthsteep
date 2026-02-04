@@ -9,6 +9,9 @@ public class ShoppingCart {
     private double baseDiscountRate = 0.0;
 
     public void addItem(Item newItem) {
+        if(newItem.getPrice() < 0)
+            throw new IllegalArgumentException("Pris kan ej vara negativt");
+
         for(Item existingItem : shoppingList) {
             if(existingItem.equals(newItem)) {
                 int updatedQuantity = existingItem.getQuantity() + newItem.getQuantity();
@@ -26,10 +29,9 @@ public class ShoppingCart {
 
     public void removeItem(Item item) {
 
-        if (!shoppingList.contains(item)) {
+        if (!shoppingList.contains(item))
             throw new IllegalStateException("Kan ej ta bort ikke-existerande vara, listan lämnas oförändrad.");
 
-        }
         shoppingList.remove(item);
 
     }

@@ -96,7 +96,7 @@ class ShoppingCartTest {
 
     //Edge case test for removing an item that is not in the cart
     @Test
-    void removing_non_added_item_should_not_effect_cart() {
+    void removing_non_added_item_should_not_effect_cart_and_throw_exception() {
         ShoppingCart shoppingCart = new ShoppingCart();
         Item existingItem = new Item("Pepsi", 18.90, 1);
         Item nonExistentItem = new Item("Coca Cola", 19.90, 1);
@@ -110,4 +110,18 @@ class ShoppingCartTest {
 
         assertThat(shoppingCart.getShoppingList()).containsExactly(existingItem);
     }
+
+    //Edge-case test for negative prices
+    @Test
+    void should_throw_exception_if_item_has_negative_price() {
+        ShoppingCart shoppingCart = new ShoppingCart();
+        Item item = new Item("Milk", -10.0, 1);
+
+        assertThatThrownBy(() ->
+                shoppingCart.addItem(item))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Pris kan ej vara negativt");
+    }
+
+
 }
