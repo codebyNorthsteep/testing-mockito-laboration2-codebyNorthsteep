@@ -3,13 +3,19 @@ package com.example.payment;
 public class PaymentProcessor {
     private static final String API_KEY = "sk_test_123456";
 
+    //Fält för Instanser
+
+
+    //Konstruktor för instanser
+
+
     public boolean processPayment(double amount) {
         // Anropar extern betaltjänst direkt med statisk API-nyckel
         PaymentApiResponse response = PaymentApi.charge(API_KEY, amount);
 
-        // Skriver till databas direkt
+        // Skriver till databas direkt - Repository save istället?
         if (response.isSuccess()) {
-            DatabaseConnection.getInstance()
+            PaymentRepository.getInstance()
                     .executeUpdate("INSERT INTO payments (amount, status) VALUES (" + amount + ", 'SUCCESS')");
         }
 
@@ -26,7 +32,8 @@ public class PaymentProcessor {
 // behöver användas via interface där implementationen av dessa kommer finnas tillgänglig I
 // ett senare skede. Modifiera koden så att den blir testbar och skriv tester för den.
 //  Identifiera och extrahera beroenden - tex. gör IO, pratar med externa system, side effects, gör koden svår att testa(mocka)
-//  Tillämpa dependency injection - beroenden skickas in/serveras istället för att PaymentProcessor skapar dem själv
+//  Tillämpa dependency injection - beroenden skickas in/serveras istället för att PaymentProcessor skapar dem själv - skickas in i dess konstruktor
 //  Skriv tester för den refaktorerade koden
 //  Dokumentera dina refaktoreringsbeslut
+    //PaymenProcessor ska bara delegera och ta emot detta via konstruktor, interfacen ska göra
 }
