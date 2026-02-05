@@ -1,5 +1,6 @@
 package com.example.payment;
 
+
 public class PaymentProcessor {
 
     //Fält för Injections
@@ -35,7 +36,7 @@ public class PaymentProcessor {
             emailService.sendPaymentConfirmation(email, amount);
         }
 
-        return processedPayment;
+        return true;
     }
 
 }
