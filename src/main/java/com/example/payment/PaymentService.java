@@ -2,5 +2,5 @@ package com.example.payment;
 
 public interface PaymentService {
 
-    boolean chargeSuccessfull(double amount);
+    boolean chargeSuccessful(double amount);
 }

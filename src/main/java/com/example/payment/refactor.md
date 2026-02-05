@@ -18,7 +18,7 @@ FLOW:
 - PaymentProcessor -> processPayment(amount, email)
   |
   v
-- PaymentService -> chargeIsSuccessful(amount)
+- PaymentService -> chargeSuccessful(amount)
   |
   v
 - TRUE
@@ -27,4 +27,4 @@ FLOW:
   -PaymentRepository -> save(amount, status)
   |
   v
-- EmailService -> sendConfirmation()
+- EmailService → sendPaymentConfirmation(String mail, double amount)
