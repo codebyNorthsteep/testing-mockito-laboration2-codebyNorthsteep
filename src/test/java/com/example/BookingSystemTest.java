@@ -273,7 +273,7 @@ class BookingSystemFlowTests{
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Kan inte avboka påbörjad eller avslutad bokning");
 
-        //verify()?
+        //verify
         verify(roomRepository, never()).save(room);
 
     }
