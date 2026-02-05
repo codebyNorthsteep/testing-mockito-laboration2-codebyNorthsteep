@@ -4,9 +4,20 @@ public class PaymentProcessor {
     private static final String API_KEY = "sk_test_123456";
 
     //Fält för Instanser
+    PaymentRepository paymentRepository;
+    PaymentService paymentService;
+    EmailService emailService;
 
 
     //Konstruktor för instanser
+    public PaymentProcessor(PaymentRepository paymentRepository,
+                            PaymentService paymentService,
+                            EmailService emailService) {
+        this.paymentRepository = paymentRepository;
+        this.paymentService = paymentService;
+        this.emailService = emailService;
+
+    }
 
 
     public boolean processPayment(double amount) {
