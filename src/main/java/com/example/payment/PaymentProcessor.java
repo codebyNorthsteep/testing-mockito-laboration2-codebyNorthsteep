@@ -1,6 +1,8 @@
 package com.example.payment;
 
 
+import com.example.NotificationException;
+
 public class PaymentProcessor {
 
     //Fält för Injections
@@ -28,13 +30,15 @@ public class PaymentProcessor {
         // Anropar PaymentRepositorys save-metod vid lyckad charge
         if (processedPayment) {
             paymentRepository.save(amount, "SUCCESS");
+
+            // Skickar e-post via EmailService vid lyckad charge
+            try {
+                emailService.sendPaymentConfirmation(email, amount);
+            } catch (NotificationException e) {
+                System.err.println("Warning! Your payment was successful but the payment confirmation was not sent." + e);
+            }
         }
 
-        // Skickar e-post via EmailService vid lyckad charge
-        if (processedPayment) {
-            //Ta bort den hårdkodade mailen - parameter
-            emailService.sendPaymentConfirmation(email, amount);
-        }
 
         return processedPayment;
     }

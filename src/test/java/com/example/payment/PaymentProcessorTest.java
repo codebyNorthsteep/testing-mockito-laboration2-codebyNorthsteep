@@ -1,5 +1,6 @@
 package com.example.payment;
 
+import com.example.NotificationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,7 +27,7 @@ class PaymentProcessorTest {
 
 
     @Test
-    void should_handle_a_successful_payment_with_payment_confirmation(){
+    void should_handle_a_successful_payment_with_payment_confirmation() throws NotificationException {
         //Arrange
         double amount = 150.00;
         String email = "very_cool_email@email.com";
@@ -45,7 +46,7 @@ class PaymentProcessorTest {
     }
 
     @Test
-    void should_handle_a_unsuccessful_payment(){
+    void should_handle_a_unsuccessful_payment() throws NotificationException {
         //Arrange
         double amount = 150.00;
         String email = "very_cool_email@email.com";
@@ -62,6 +63,28 @@ class PaymentProcessorTest {
                 .save(amount, "SUCCESS");
         verify(emailService, never())
                 .sendPaymentConfirmation(email, amount);
+
+    }
+
+    // --- Edge cases, created with TDD ---
+
+    @Test
+    void should_make_successful_payment_even_if_payment_confirmation_fails() throws NotificationException {
+        //Arrange
+        double amount = 150.00;
+        String email = "very_cool_email@email.com";
+        when(paymentService.chargeSuccessful(amount)).thenReturn(true);
+        doThrow(new NotificationException("Warning! Your payment was successful but the payment confirmation was not sent."))
+                .when(emailService).sendPaymentConfirmation(email, amount);
+
+        //Act
+        boolean result = paymentProcessor.processPayment(amount, email);
+
+        //Assert
+        assertThat(result).isTrue();
+
+        //Verify
+        verify(paymentRepository).save(amount, "SUCCESS");
 
     }
 
