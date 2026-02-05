@@ -1,7 +1,5 @@
-package com.example;
+package com.example.shop;
 
-import com.example.shop.Item;
-import com.example.shop.ShoppingCart;
 import org.junit.jupiter.api.Test;
 
 import java.util.stream.Stream;
