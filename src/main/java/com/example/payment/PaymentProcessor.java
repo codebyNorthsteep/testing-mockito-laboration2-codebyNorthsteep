@@ -1,15 +1,15 @@
 package com.example.payment;
 
 public class PaymentProcessor {
-    private static final String API_KEY = "sk_test_123456";
+//    private static final String API_KEY = "sk_test_123456";
 
-    //Fält för Instanser
+    //Fält för Injections
     PaymentRepository paymentRepository;
     PaymentService paymentService;
     EmailService emailService;
 
 
-    //Konstruktor för instanser
+    //Konstruktor för Injections
     public PaymentProcessor(PaymentRepository paymentRepository,
                             PaymentService paymentService,
                             EmailService emailService) {
@@ -20,22 +20,23 @@ public class PaymentProcessor {
     }
 
 
-    public boolean processPayment(double amount) {
-        // Anropar extern betaltjänst direkt med statisk API-nyckel
-        PaymentApiResponse response = PaymentApi.charge(API_KEY, amount);
+    public boolean processPayment(double amount, String email) {
+        // Anropar extern betaltjänst som returnerar true vid lyckad betalning
+        //Gjorde från början en två metoder i PaymentService en charge och en isSuccess, risken i detta blir när två olika betalningar görs och den ena överskriver den andra
+        boolean processedPayment = paymentService.chargeSuccessfull(amount);
 
-        // Skriver till databas direkt - Repository save istället?
-        if (response.isSuccess()) {
-            PaymentRepository.getInstance()
-                    .executeUpdate("INSERT INTO payments (amount, status) VALUES (" + amount + ", 'SUCCESS')");
+        // Anropar PaymentRepositorys save-metod vid lyckad charge
+        if (processedPayment) {
+            paymentRepository.save(amount, "SUCCESS");
         }
 
-        // Skickar e-post direkt
-        if (response.isSuccess()) {
-            EmailService.sendPaymentConfirmation("user@example.com", amount);
+        // Skickar e-post via EmailService vid lyckad charge
+        if (processedPayment) {
+            //Ta bort den hårdkodade mailen - parameter
+            emailService.sendPaymentConfirmation(email, amount);
         }
 
-        return response.isSuccess();
+        return processedPayment;
     }
 
 // I paketet payment finns en utkommenterad klass som heter PaymentProcessor.

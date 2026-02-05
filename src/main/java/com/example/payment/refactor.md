@@ -1,4 +1,5 @@
 Bryter ut beroenden - dessa injiceras sedan i PaymentProcessors konstruktor (Dependency injection)
+PaymentProcessor ska inte behöva bry sig om HUR t.ex. email skickas, bara ATT det gör det.
 Genom att injicera dessa via konstruktorn istället så frikopplas affärslogiken, 
 vilket gör att jag kan byta ut t.ex. EmailService mot en Mock i enhetstesterna.
 
@@ -11,19 +12,16 @@ Anropning av extern betaltjänst
 - PaymentApi - Skapar PaymentService istället för att skapa en statisk PaymentApiResponse
 
 EmailService
-- Skickar bekräftelse
+- Har nu ansvar för att skicka bekräftelse
 
-Flöde:
+FLOW:
 - PaymentProcessor -> processPayment(amount, email)
   |
   v
-- PaymentService -> process(amount)
+- PaymentService -> chargeIsSuccessful(amount)
   |
   v
-- PaymentService -> isSuccess()
-  |
-  v
-- JA
+- TRUE
   |
   v
   -PaymentRepository -> save(amount, status)
