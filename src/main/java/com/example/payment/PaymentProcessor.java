@@ -36,7 +36,7 @@ public class PaymentProcessor {
             emailService.sendPaymentConfirmation(email, amount);
         }
 
-        return true;
+        return processedPayment;
     }
 
 }
