@@ -108,25 +108,29 @@ class PaymentProcessorTest {
      * of email confirmation as critical and still considers the payment process to be
      * completed successfully.
      */
-//    @Test
-//    void should_make_successful_payment_even_if_payment_confirmation_fails() throws NotificationException {
-//        //Arrange
-//        double amount = 150.00;
-//        String email = "very_cool_email@email.com";
-//        when(paymentService.chargeSuccessful(amount)).thenReturn(true);
-//        doThrow(new NotificationException("Warning! Your payment was successful but the payment confirmation was not sent."))
-//                .when(emailService).sendPaymentConfirmation(email, amount);
+    @Test
+    void should_make_successful_payment_even_if_payment_confirmation_fails() throws NotificationException {
+        //Arrange
+        double amount = 150.00;
+        String email = "very_cool_email@email.com";
+        PaymentStatusHandler payment = new PaymentStatusHandler(amount, PaymentStatus.PENDING);
+
+        when(paymentRepository.save(any(PaymentStatusHandler.class))).thenReturn(payment);
+        when(paymentService.chargeSuccessful(amount)).thenReturn(true);
+        doThrow(new NotificationException("Warning! Your payment was successful but the payment confirmation was not sent."))
+                .when(emailService).sendPaymentConfirmation(email, amount);
+
+        //Act
+        boolean result = paymentProcessor.processPayment(amount, email);
+
+        //Assert
+        assertThat(result).isTrue();
+
+        //Verify
+        verify(paymentRepository).update(argThat(p -> p.getStatus() == PaymentStatus.SUCCESS));
 //
-//        //Act
-//        boolean result = paymentProcessor.processPayment(amount, email);
-//
-//        //Assert
-//        assertThat(result).isTrue();
-//
-//        //Verify
-//        verify(paymentRepository).save(amount, "SUCCESS");
-//
-//    }
+
+    }
 //
 //
 //
