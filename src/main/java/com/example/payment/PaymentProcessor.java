@@ -3,6 +3,26 @@ package com.example.payment;
 
 import com.example.NotificationException;
 
+/**
+ * The PaymentProcessor class manages the process of handling payments,
+ * saving their statuses, and sending payment confirmations via email.
+ *
+ * The class is designed with dependency injection, allowing the injection
+ * of PaymentRepository, PaymentService, and EmailService implementations.
+ *
+ * Responsibilities:
+ * - Validates the payment amount to ensure it is greater than zero.
+ * - Processes payments through an external PaymentService.
+ * - Saves the payment status to a repository via PaymentRepository.
+ * - Sends an email confirmation using EmailService upon successful payments
+ *   if a valid email address is provided.
+ *
+ * Key Error Handling:
+ * - Throws an IllegalArgumentException if the payment amount is invalid.
+ * - Throws a FailedPaymentException if the payment is declined.
+ * - Throws a DatabaseException if saving to the repository fails.
+ * - Logs an error without interrupting the flow when email sending fails.
+ */
 public class PaymentProcessor {
 
     //Fält för Injections
@@ -41,10 +61,10 @@ public class PaymentProcessor {
         try {
             paymentRepository.save(amount, "SUCCESS");
         } catch (DatabaseException e) {
-            throw new DatabaseException("Database error, no payment was saved" + e);
+            throw new DatabaseException("Database error, no payment was saved");
         }
 
-        if (!email.isBlank()) {
+        if (email != null && !email.isBlank()) {
             // Skickar e-post via EmailService vid lyckad charge samt valid email-adress
             try {
                 emailService.sendPaymentConfirmation(email, amount);

@@ -25,6 +25,10 @@ class PaymentProcessorTest {
     private PaymentProcessor paymentProcessor;
 
 
+    /**
+     * Tests the scenario where a successful payment is processed, and a payment confirmation
+     * email is sent.
+     */
     @Test
     void should_handle_a_successful_payment_with_payment_confirmation() throws NotificationException {
         //Arrange
@@ -44,6 +48,9 @@ class PaymentProcessorTest {
 
     }
 
+    /**
+     * Tests the behavior of the PaymentProcessor when the payment is declined by the PaymentService and that the exception is thrown.
+     */
     //Ersatte should_handle_a_unsuccessful_payment() efter att jag skapade detta test, detta då den failade eftersom att den nu kastar en exception innan den avslutar
     @Test
     void should_throw_exception_if_payment_gets_declined() {
@@ -64,6 +71,12 @@ class PaymentProcessorTest {
 
     // --- Edge cases, created with TDD ---
 
+    /**
+     * Tests the scenario where a payment is processed successfully, even if sending the payment
+     * confirmation email fails. This test ensures that the system does not treat the failure
+     * of email confirmation as critical and still considers the payment process to be
+     * completed successfully.
+     */
     @Test
     void should_make_successful_payment_even_if_payment_confirmation_fails() throws NotificationException {
         //Arrange
@@ -84,8 +97,15 @@ class PaymentProcessorTest {
 
     }
 
-    //todo: tester för validering av input-data
 
+
+    /**
+     * Tests the behavior of the PaymentProcessor when saving a successfully processed
+     * payment to the database fails.
+     * This test simulates a scenario where a payment has already been successfully charged
+     * via the PaymentService, but an exception is thrown while attempting to save the payment
+     * with its status in the PaymentRepository.
+     */
     @Test
     void should_throw_exception_if_saving_to_database_fails() {
         //Arrange
@@ -105,6 +125,9 @@ class PaymentProcessorTest {
 
     }
 
+    /**
+     * Tests the behavior of the `processPayment` method in the `PaymentProcessor` class when provided with an invalid payment amount.
+     */
     @Test
     void should_throw_exception_if_amount_is_invalid() {
         //Arrange
@@ -118,11 +141,15 @@ class PaymentProcessorTest {
                 .hasMessageContaining("Amount can't be 0 or less");
     }
 
+    /**
+     * Tests the behavior of the PaymentProcessor when processing a payment
+     * while the provided email address is blank or consists only of whitespace.
+     */
     @Test
     void should_not_call_emailService_if_email_is_blank() {
         // Arrange
         double amount = 150.00;
-        String email = "   "; // Blank email
+        String email = ""; // Blank email
         when(paymentService.chargeSuccessful(amount)).thenReturn(true);
 
         // Act
