@@ -91,7 +91,7 @@ class PaymentProcessorTest {
     //todo: exception vid avbruten betalning/nekad
 
     @Test
-    void should_throw_exception_if_database_fails() {
+    void should_throw_exception_if_payment_gets_declined() {
         //Arrange
         double amount = 150.00;
         String email = "very_cool_email@email.com";
@@ -106,6 +106,7 @@ class PaymentProcessorTest {
 
 
     }
+
 
 
 }
