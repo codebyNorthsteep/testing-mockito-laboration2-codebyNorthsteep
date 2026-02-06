@@ -49,19 +49,32 @@ public class PaymentProcessor {
         }
 
 
+
+        PaymentStatusHandler payment;
+        try {
+            payment = paymentRepository.save(new PaymentStatusHandler(amount, PaymentStatus.PENDING));
+        } catch (DatabaseException e) {
+            throw new DatabaseException("Database error, could not initialize payment in database");
+        }
+
         // Anropar extern betaltjänst som returnerar true vid lyckad betalning
         //Gjorde från början en två metoder i PaymentService en charge och en isSuccess, risken i detta blir när två olika betalningar görs och den ena överskriver den andra
         boolean processedPayment = paymentService.chargeSuccessful(amount);
-
+        try {
+            if (processedPayment) {
+                payment.setStatus(PaymentStatus.SUCCESS);
+            } else {
+                payment.setStatus(PaymentStatus.FAILED);
+            }
+            paymentRepository.update(payment);
+        } catch (DatabaseException e) {
+            // Logga kritiskt fel: Betalningen genomfördes men DB-uppdateringen dog
+            System.err.println("CRITICAL: Payment processed but DB update failed for amount: " + amount);
+            throw e;
+        }
         // Anropar PaymentRepositorys save-metod vid lyckad charge
         if (!processedPayment) {
             throw new FailedPaymentException("Your payment has been declined");
-        }
-
-        try {
-            paymentRepository.save(amount, "SUCCESS");
-        } catch (DatabaseException e) {
-            throw new DatabaseException("Database error, no payment was saved");
         }
 
         if (email != null && !email.isBlank()) {
