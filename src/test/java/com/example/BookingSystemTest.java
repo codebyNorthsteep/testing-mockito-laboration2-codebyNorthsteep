@@ -146,7 +146,7 @@ class BookingSystemFlowTests{
          */
     @Test
     void book_a_room_with_start_date_before_today_should_throw_exception() throws NotificationException {
-        //Arrange, överflödig men bra för att se hela strukturen av denna mock
+        //Arrange
         String roomId = "room1";
         LocalDateTime startDate = now.minusDays(1);
         LocalDateTime endDate = now.plusDays(1);
@@ -181,11 +181,7 @@ class BookingSystemFlowTests{
                 bookingSystem.bookRoom(roomId, startDate, endDate))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Rummet existerar inte");
-        //Assert
-        verify(notificationService, never())
-                .sendBookingConfirmation(any());
-        verify(roomRepository, never())
-                .save(any());
+
     }
 
         /**

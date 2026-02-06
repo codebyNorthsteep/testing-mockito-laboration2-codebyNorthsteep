@@ -8,8 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -85,6 +84,26 @@ class PaymentProcessorTest {
 
         //Verify
         verify(paymentRepository).save(amount, "SUCCESS");
+
+    }
+
+    //todo: tester för validering av input-data
+    //todo: exception vid avbruten betalning/nekad
+
+    @Test
+    void should_throw_exception_if_database_fails() {
+        //Arrange
+        double amount = 150.00;
+        String email = "very_cool_email@email.com";
+        when(paymentService.chargeSuccessful(amount)).thenReturn(false);
+
+
+        //act + Assert
+        assertThatThrownBy(()->
+                paymentProcessor.processPayment(amount, email))
+                .isInstanceOf(FailedPaymentException.class)
+                .hasMessageContaining("Your payment has been declined");
+
 
     }
 

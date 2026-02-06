@@ -28,6 +28,10 @@ public class PaymentProcessor {
         boolean processedPayment = paymentService.chargeSuccessful(amount);
 
         // Anropar PaymentRepositorys save-metod vid lyckad charge
+        if (!processedPayment)
+            throw new FailedPaymentException("Your payment has been declined");
+
+
         if (processedPayment) {
             paymentRepository.save(amount, "SUCCESS");
 
