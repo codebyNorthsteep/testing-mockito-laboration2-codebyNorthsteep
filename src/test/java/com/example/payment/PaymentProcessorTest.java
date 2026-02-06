@@ -75,28 +75,31 @@ class PaymentProcessorTest {
         verifyNoInteractions(emailService);
     }
 
+    // --- Edge cases, created with TDD ---
+
     /**
      * Tests the behavior of the PaymentProcessor when the payment is declined by the PaymentService and that the exception is thrown.
      */
 
-//    @Test
-//    void should_throw_exception_if_payment_gets_declined() {
-//        //Arrange
-//        double amount = 150.00;
-//        String email = "very_cool_email@email.com";
-//        when(paymentService.chargeSuccessful(amount)).thenReturn(false);
-//
-//
-//        //act + Assert
-//        assertThatThrownBy(() ->
-//                paymentProcessor.processPayment(amount, email))
-//                .isInstanceOf(FailedPaymentException.class)
-//                .hasMessageContaining("Your payment has been declined");
-//
-//
-//    }
+    @Test
+    void should_throw_exception_if_payment_gets_declined() {
+        //Arrange
+        double amount = 150.00;
+        String email = "very_cool_email@email.com";
+        PaymentStatusHandler payment = new PaymentStatusHandler(amount, PaymentStatus.PENDING);
 
-    // --- Edge cases, created with TDD ---
+        when(paymentRepository.save(any(PaymentStatusHandler.class))).thenReturn(payment);
+        when(paymentService.chargeSuccessful(amount)).thenReturn(false);
+
+
+        //act + Assert
+        assertThatThrownBy(() ->
+                paymentProcessor.processPayment(amount, email))
+                .isInstanceOf(FailedPaymentException.class)
+                .hasMessageContaining("Your payment has been declined");
+
+
+    }
 
 
     /**
