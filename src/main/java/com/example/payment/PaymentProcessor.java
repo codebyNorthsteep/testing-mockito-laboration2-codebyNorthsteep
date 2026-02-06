@@ -41,7 +41,7 @@ public class PaymentProcessor {
         try {
             payment = paymentRepository.save(new PaymentStatusHandler(amount, PaymentStatus.PENDING));
         } catch (DatabaseException e) {
-            throw new DatabaseException("Database error, could not initialize payment in database");
+            throw new DatabaseException("Database error, could not initialize payment in database", e);
         }
 
         // Anropar extern betaltjänst som returnerar true vid lyckad betalning
@@ -55,9 +55,8 @@ public class PaymentProcessor {
             }
             paymentRepository.update(payment);
         } catch (DatabaseException e) {
-            // Logga kritiskt fel: Betalningen genomfördes men DB-uppdateringen dog
-            System.err.println("CRITICAL: Payment processed but DB update failed for amount: " + amount);
-            throw e;
+            // Logga kritiskt fel, betalningen genomfördes men DB-uppdateringen dog
+            System.err.println("CRITICAL: Payment processed but DB update failed," + e);
         }
         // Anropar PaymentRepositorys save-metod vid lyckad charge
         if (!processedPayment) {
@@ -70,7 +69,7 @@ public class PaymentProcessor {
                 emailService.sendPaymentConfirmation(email, amount);
             } catch (NotificationException e) {
                 //LOgga bara felet så att koden inte dör om sendPaymentConfirmation inte funkar
-                System.err.println("Warning! Your payment was successful but the payment confirmation was not sent.");
+                System.err.println("Warning! Your payment was successful but the payment confirmation was not sent." + e);
             }
         }
 

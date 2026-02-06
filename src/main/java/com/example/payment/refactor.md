@@ -24,7 +24,10 @@ FLOW:
 - PaymentProcessor -> processPayment(amount, email)
   |
   v
-- PaymentRepository -> save(amount, PaymentStatus.PENDING)
+- PaymentStatusHandler payment;
+  |
+  v
+- PaymentRepository -> paymentRepository.save(new PaymentStatusHandler(amount, PaymentStatus.PENDING))
   |
   v
 - PaymentService -> chargeSuccessful(amount)
@@ -33,10 +36,10 @@ FLOW:
 - TRUE/FALSE
   |
   v
-- PaymentRepository -> update(amount, PaymentStatus.SUCCESS/FAILED)
+- PaymentRepository -> paymentRepository.update(payment, with SUCCESS/FAILED);
   |
   v
-- EmailService → sendPaymentConfirmation(String mail, double amount) (Endast om betalningen gick igenom)
+- EmailService → sendPaymentConfirmation(String mail, double amount) (Endast om betalningen gick igenom, SUCCESS)
 
 
 Egna implementationer via TDD i flödet:
