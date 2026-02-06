@@ -105,5 +105,18 @@ class PaymentProcessorTest {
 
     }
 
+    @Test
+    void should_throw_exception_if_amount_is_invalid() {
+        //Arrange
+        double amount = 0.0;
+        String email = "very_cool_email@email.com";
+
+        //act + assert
+        assertThatThrownBy(()->
+                paymentProcessor.processPayment(amount, email))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Amount can't be 0 or less");
+    }
+
 
 }

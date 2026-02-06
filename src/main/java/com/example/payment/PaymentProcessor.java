@@ -23,6 +23,12 @@ public class PaymentProcessor {
 
 
     public boolean processPayment(double amount, String email)  {
+
+        if(amount <= 0){
+            throw new IllegalArgumentException("Amount can't be 0 or less");
+        }
+
+
         // Anropar extern betaltjänst som returnerar true vid lyckad betalning
         //Gjorde från början en två metoder i PaymentService en charge och en isSuccess, risken i detta blir när två olika betalningar görs och den ena överskriver den andra
         boolean processedPayment = paymentService.chargeSuccessful(amount);
