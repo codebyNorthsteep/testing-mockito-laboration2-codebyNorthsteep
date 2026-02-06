@@ -44,14 +44,15 @@ public class PaymentProcessor {
             throw new DatabaseException("Database error, no payment was saved" + e);
         }
 
-            // Skickar e-post via EmailService vid lyckad charge
+        if (!email.isBlank()) {
+            // Skickar e-post via EmailService vid lyckad charge samt valid email-adress
             try {
                 emailService.sendPaymentConfirmation(email, amount);
             } catch (NotificationException e) {
                 //LOgga bara felet så att koden inte dör om sendPaymentConfirmation inte funkar
                 System.err.println("Warning! Your payment was successful but the payment confirmation was not sent." + e);
             }
-
+        }
 
 
         return processedPayment;

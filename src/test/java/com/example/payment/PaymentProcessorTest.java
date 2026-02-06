@@ -118,5 +118,23 @@ class PaymentProcessorTest {
                 .hasMessageContaining("Amount can't be 0 or less");
     }
 
+    @Test
+    void should_not_call_emailService_if_email_is_blank()  {
+        // Arrange
+        double amount = 150.00;
+        String email = "   "; // Blank email
+        when(paymentService.chargeSuccessful(amount)).thenReturn(true);
+
+        // Act
+        boolean result = paymentProcessor.processPayment(amount, email);
+
+        // Assert
+        assertThat(result).isTrue();
+
+        // Verify
+        verify(paymentRepository).save(amount, "SUCCESS");
+        verifyNoInteractions(emailService);
+    }
+
 
 }
