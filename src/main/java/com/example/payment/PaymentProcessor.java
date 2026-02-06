@@ -22,9 +22,9 @@ public class PaymentProcessor {
     }
 
 
-    public boolean processPayment(double amount, String email)  {
+    public boolean processPayment(double amount, String email) {
 
-        if(amount <= 0){
+        if (amount <= 0) {
             throw new IllegalArgumentException("Amount can't be 0 or less");
         }
 
@@ -40,7 +40,7 @@ public class PaymentProcessor {
 
         try {
             paymentRepository.save(amount, "SUCCESS");
-        }catch (DatabaseException e) {
+        } catch (DatabaseException e) {
             throw new DatabaseException("Database error, no payment was saved" + e);
         }
 
@@ -50,7 +50,7 @@ public class PaymentProcessor {
                 emailService.sendPaymentConfirmation(email, amount);
             } catch (NotificationException e) {
                 //LOgga bara felet så att koden inte dör om sendPaymentConfirmation inte funkar
-                System.err.println("Warning! Your payment was successful but the payment confirmation was not sent." + e);
+                System.err.println("Warning! Your payment was successful but the payment confirmation was not sent.");
             }
         }
 

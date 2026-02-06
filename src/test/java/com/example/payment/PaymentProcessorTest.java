@@ -54,7 +54,7 @@ class PaymentProcessorTest {
 
 
         //act + Assert
-        assertThatThrownBy(()->
+        assertThatThrownBy(() ->
                 paymentProcessor.processPayment(amount, email))
                 .isInstanceOf(FailedPaymentException.class)
                 .hasMessageContaining("Your payment has been declined");
@@ -97,7 +97,7 @@ class PaymentProcessorTest {
                 .when(paymentRepository).save(amount, "SUCCESS");
 
         //act + Assert
-        assertThatThrownBy(()->
+        assertThatThrownBy(() ->
                 paymentProcessor.processPayment(amount, email))
                 .isInstanceOf(DatabaseException.class)
                 .hasMessageContaining("Database error, no payment was saved");
@@ -112,14 +112,14 @@ class PaymentProcessorTest {
         String email = "very_cool_email@email.com";
 
         //act + assert
-        assertThatThrownBy(()->
+        assertThatThrownBy(() ->
                 paymentProcessor.processPayment(amount, email))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Amount can't be 0 or less");
     }
 
     @Test
-    void should_not_call_emailService_if_email_is_blank()  {
+    void should_not_call_emailService_if_email_is_blank() {
         // Arrange
         double amount = 150.00;
         String email = "   "; // Blank email
