@@ -75,7 +75,30 @@ class PaymentProcessorTest {
         verifyNoInteractions(emailService);
     }
 
-    // --- Edge cases, created with TDD ---
+    /**
+     * Tests the behavior of the `processPayment` method in the `PaymentProcessor` class when a payment
+     * is successfully charged but updating the payment status in the database fails.
+     */
+    @Test
+    void should_throw_database_exception_if_update_fails_after_successful_charge() throws DatabaseException {
+        // Arrange
+        double amount = 3000.00;
+        String email = "super_awesome_email@cool.com";
+        PaymentStatusHandler payment = new PaymentStatusHandler(amount, PaymentStatus.PENDING);
+
+        when(paymentRepository.save(any(PaymentStatusHandler.class))).thenReturn(payment);
+        when(paymentService.chargeSuccessful(amount)).thenReturn(true);
+
+        // Simuleras databaskrashen efter att betalningen genomförts
+        doThrow(new DatabaseException("CRITICAL: Payment processed but DB update failed for amount: " + amount))
+                .when(paymentRepository).update(any(PaymentStatusHandler.class));
+
+        // Act + Assert
+        assertThatThrownBy(() -> paymentProcessor.processPayment(amount, email))
+                .isInstanceOf(DatabaseException.class)
+                .hasMessageContaining("CRITICAL: Payment processed but DB update failed for amount: " + amount);
+
+    }
 
     /**
      * Tests the behavior of the PaymentProcessor when the payment is declined by the PaymentService and that the exception is thrown.
