@@ -4,6 +4,6 @@ import com.example.NotificationException;
 
 public interface EmailService {
 
-    void sendPaymentConfirmation(String mail, double amount);
+    void sendPaymentConfirmation(String mail, double amount) throws NotificationException;
 
 }

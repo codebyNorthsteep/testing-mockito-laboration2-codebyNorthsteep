@@ -2,6 +2,8 @@ package com.example.payment;
 
 public interface PaymentRepository {
 
-    void save(double amount, String status);
+    PaymentStatusHandler save(PaymentStatusHandler status) throws DatabaseException;
+
+    void update(PaymentStatusHandler status) throws DatabaseException;
 
 }
