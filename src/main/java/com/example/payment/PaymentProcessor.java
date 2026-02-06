@@ -22,26 +22,30 @@ public class PaymentProcessor {
     }
 
 
-    public boolean processPayment(double amount, String email) {
+    public boolean processPayment(double amount, String email)  {
         // Anropar extern betaltjänst som returnerar true vid lyckad betalning
         //Gjorde från början en två metoder i PaymentService en charge och en isSuccess, risken i detta blir när två olika betalningar görs och den ena överskriver den andra
         boolean processedPayment = paymentService.chargeSuccessful(amount);
 
         // Anropar PaymentRepositorys save-metod vid lyckad charge
-        if (!processedPayment)
+        if (!processedPayment) {
             throw new FailedPaymentException("Your payment has been declined");
+        }
 
-
-        if (processedPayment) {
+        try {
             paymentRepository.save(amount, "SUCCESS");
+        }catch (DatabaseException e) {
+            throw new DatabaseException("Database error, no payment was saved" + e);
+        }
 
             // Skickar e-post via EmailService vid lyckad charge
             try {
                 emailService.sendPaymentConfirmation(email, amount);
             } catch (NotificationException e) {
+                //LOgga bara felet så att koden inte dör om sendPaymentConfirmation inte funkar
                 System.err.println("Warning! Your payment was successful but the payment confirmation was not sent." + e);
             }
-        }
+
 
 
         return processedPayment;

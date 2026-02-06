@@ -44,24 +44,21 @@ class PaymentProcessorTest {
 
     }
 
+    //Ersatte should_handle_a_unsuccessful_payment() efter att jag skapade detta test, detta då den failade eftersom att den nu kastar en exception innan den avslutar
     @Test
-    void should_handle_a_unsuccessful_payment() throws NotificationException {
+    void should_throw_exception_if_payment_gets_declined() {
         //Arrange
         double amount = 150.00;
         String email = "very_cool_email@email.com";
         when(paymentService.chargeSuccessful(amount)).thenReturn(false);
 
-        //Act
-        boolean result = paymentProcessor.processPayment(amount, email);
 
-        //Assert
-        assertThat(result).isFalse();
+        //act + Assert
+        assertThatThrownBy(()->
+                paymentProcessor.processPayment(amount, email))
+                .isInstanceOf(FailedPaymentException.class)
+                .hasMessageContaining("Your payment has been declined");
 
-        //Verify
-        verify(paymentRepository, never())
-                .save(amount, "SUCCESS");
-        verify(emailService, never())
-                .sendPaymentConfirmation(email, amount);
 
     }
 
@@ -88,25 +85,25 @@ class PaymentProcessorTest {
     }
 
     //todo: tester för validering av input-data
-    //todo: exception vid avbruten betalning/nekad
 
     @Test
-    void should_throw_exception_if_payment_gets_declined() {
+    void should_throw_exception_if_saving_to_database_fails() {
         //Arrange
         double amount = 150.00;
         String email = "very_cool_email@email.com";
-        when(paymentService.chargeSuccessful(amount)).thenReturn(false);
-
+        when(paymentService.chargeSuccessful(amount)).thenReturn(true);
+        //Simulerar en databaskrash
+        doThrow(new DatabaseException("Connection lost"))
+                .when(paymentRepository).save(amount, "SUCCESS");
 
         //act + Assert
         assertThatThrownBy(()->
                 paymentProcessor.processPayment(amount, email))
-                .isInstanceOf(FailedPaymentException.class)
-                .hasMessageContaining("Your payment has been declined");
+                .isInstanceOf(DatabaseException.class)
+                .hasMessageContaining("Database error, no payment was saved");
 
 
     }
-
 
 
 }
