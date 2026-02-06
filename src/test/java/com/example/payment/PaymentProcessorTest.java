@@ -128,75 +128,70 @@ class PaymentProcessorTest {
 
         //Verify
         verify(paymentRepository).update(argThat(p -> p.getStatus() == PaymentStatus.SUCCESS));
-//
+
 
     }
-//
-//
-//
-//    /**
-//     * Tests the behavior of the PaymentProcessor when saving a successfully processed
-//     * payment to the database fails.
-//     * This test simulates a scenario where a payment has already been successfully charged
-//     * via the PaymentService, but an exception is thrown while attempting to save the payment
-//     * with its status in the PaymentRepository.
-//     */
-//    @Test
-//    void should_throw_exception_if_saving_to_database_fails() {
-//        //Arrange
-//        double amount = 150.00;
-//        String email = "very_cool_email@email.com";
-//        when(paymentService.chargeSuccessful(amount)).thenReturn(true);
-//        //Simulerar en databaskrash
-//        doThrow(new DatabaseException("Connection lost"))
-//                .when(paymentRepository).save(amount, "SUCCESS");
-//
-//        //act + Assert
-//        assertThatThrownBy(() ->
-//                paymentProcessor.processPayment(amount, email))
-//                .isInstanceOf(DatabaseException.class)
-//                .hasMessageContaining("Database error, no payment was saved");
-//
-//
-//    }
-//
-//    /**
-//     * Tests the behavior of the `processPayment` method in the `PaymentProcessor` class when provided with an invalid payment amount.
-//     */
-//    @Test
-//    void should_throw_exception_if_amount_is_invalid() {
-//        //Arrange
-//        double amount = 0.0;
-//        String email = "very_cool_email@email.com";
-//
-//        //act + assert
-//        assertThatThrownBy(() ->
-//                paymentProcessor.processPayment(amount, email))
-//                .isInstanceOf(IllegalArgumentException.class)
-//                .hasMessageContaining("Amount can't be 0 or less");
-//    }
-//
-//    /**
-//     * Tests the behavior of the PaymentProcessor when processing a payment
-//     * while the provided email address is blank or consists only of whitespace.
-//     */
-//    @Test
-//    void should_not_call_emailService_if_email_is_blank() {
-//        // Arrange
-//        double amount = 150.00;
-//        String email = ""; // Blank email
-//        when(paymentService.chargeSuccessful(amount)).thenReturn(true);
-//
-//        // Act
-//        boolean result = paymentProcessor.processPayment(amount, email);
-//
-//        // Assert
-//        assertThat(result).isTrue();
-//
-//        // Verify
-//        verify(paymentRepository).save(amount, "SUCCESS");
-//        verifyNoInteractions(emailService);
-//    }
+
+
+
+    /**
+     * Tests the scenario where an exception is thrown during the initial save of a payment in the database.
+     */
+    @Test
+    void should_throw_exception_if_initial_save_fails() throws DatabaseException {
+        // Arrange
+        double amount = 100.0;
+        when(paymentRepository.save(any(PaymentStatusHandler.class)))
+                .thenThrow(new DatabaseException("DB Crash"));
+
+        // Act + Assert
+        assertThatThrownBy(() -> paymentProcessor.processPayment(amount, "test@test.com"))
+                .isInstanceOf(DatabaseException.class)
+                .hasMessageContaining("Database error, could not initialize payment in database");
+
+        // verify
+        verifyNoInteractions(paymentService);
+    }
+
+    /**
+     * Tests the behavior of the `processPayment` method in the `PaymentProcessor` class when provided with an invalid payment amount.
+     */
+    @Test
+    void should_throw_exception_if_amount_is_invalid() {
+        //Arrange
+        double amount = 0.0;
+        String email = "very_cool_email@email.com";
+
+        //act + assert
+        assertThatThrownBy(() ->
+                paymentProcessor.processPayment(amount, email))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Amount can't be 0 or less");
+    }
+
+    /**
+     * Tests the behavior of the PaymentProcessor when processing a payment
+     * while the provided email address is blank or consists only of whitespace.
+     */
+    @Test
+    void should_not_call_emailService_if_email_is_blank() {
+        // Arrange
+        double amount = 150.00;
+        String email = ""; // Blank email
+        PaymentStatusHandler payment = new PaymentStatusHandler(amount, PaymentStatus.PENDING);
+
+        when(paymentRepository.save(any(PaymentStatusHandler.class))).thenReturn(payment);
+        when(paymentService.chargeSuccessful(amount)).thenReturn(true);
+
+        // Act
+        boolean result = paymentProcessor.processPayment(amount, email);
+
+        // Assert
+        assertThat(result).isTrue();
+
+        // Verify
+        verifyNoInteractions(emailService);
+    }
 
 
 }
