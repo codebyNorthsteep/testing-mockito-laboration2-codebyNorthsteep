@@ -36,7 +36,6 @@ public class PaymentProcessor {
         }
 
 
-
         PaymentStatusHandler payment;
         try {
             payment = paymentRepository.save(new PaymentStatusHandler(amount, PaymentStatus.PENDING));
@@ -55,7 +54,10 @@ public class PaymentProcessor {
             }
             paymentRepository.update(payment);
         } catch (DatabaseException e) {
-            throw new DatabaseException("CRITICAL: Payment processed but DB update failed. ", e);
+            String message = processedPayment
+                    ? "CRITICAL: Payment processed but DB update failed."
+                    : "Database error, could not update payment status to FAILED.";
+            throw new DatabaseException(message, e);
         }
         // Anropar PaymentRepositorys save-metod vid lyckad charge
         if (!processedPayment) {
