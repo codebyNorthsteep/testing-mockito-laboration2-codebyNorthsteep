@@ -55,8 +55,7 @@ public class PaymentProcessor {
             }
             paymentRepository.update(payment);
         } catch (DatabaseException e) {
-            // Logga kritiskt fel, betalningen genomfördes men DB-uppdateringen dog
-            System.err.println("CRITICAL: Payment processed but DB update failed," + e);
+            throw new DatabaseException("CRITICAL: Payment processed but DB update failed. ", e);
         }
         // Anropar PaymentRepositorys save-metod vid lyckad charge
         if (!processedPayment) {

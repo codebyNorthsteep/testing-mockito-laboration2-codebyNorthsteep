@@ -90,13 +90,13 @@ class PaymentProcessorTest {
         when(paymentService.chargeSuccessful(amount)).thenReturn(true);
 
         // Simuleras databaskrashen efter att betalningen genomförts
-        doThrow(new DatabaseException("CRITICAL: Payment processed but DB update failed for amount: " + amount))
+        doThrow(new DatabaseException("Database Error"))
                 .when(paymentRepository).update(any(PaymentStatusHandler.class));
 
         // Act + Assert
         assertThatThrownBy(() -> paymentProcessor.processPayment(amount, email))
                 .isInstanceOf(DatabaseException.class)
-                .hasMessageContaining("CRITICAL: Payment processed but DB update failed for amount: " + amount);
+                .hasMessageContaining("CRITICAL: Payment processed but DB update failed");
 
     }
 
